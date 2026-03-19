@@ -61,10 +61,11 @@ export function GenerateForm() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="flex-1 space-y-2">
+            <div className="flex-1">
               <Label htmlFor="topic">Topic</Label>
               <Input
                 id="topic"
+                className="mt-2"
                 placeholder="e.g. Benefits of remote work"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
@@ -72,7 +73,7 @@ export function GenerateForm() {
                 required
               />
             </div>
-            <div className="w-full space-y-2 sm:w-44">
+            <div className="w-full sm:w-44">
               <Label>Style</Label>
               <Select
                 value={style}
@@ -80,7 +81,7 @@ export function GenerateForm() {
                   if (v) setStyle(v);
                 }}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="mt-2 w-full">
                   <SelectValue placeholder="Select style" />
                 </SelectTrigger>
                 <SelectContent>
