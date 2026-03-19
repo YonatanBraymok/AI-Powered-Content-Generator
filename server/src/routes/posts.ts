@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
-import { apiLimiter } from "../middleware/rateLimit";
 import {
   getUserPosts,
   getPostById,
@@ -10,8 +9,6 @@ import {
 } from "../services/post";
 
 const router = Router();
-
-router.use(apiLimiter);
 
 router.get("/shared/:shareId", async (req: Request, res: Response) => {
   try {

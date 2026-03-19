@@ -1,13 +1,11 @@
 import { Router, Request, Response } from "express";
 import { authenticate } from "../middleware/auth";
-import { generateLimiter } from "../middleware/rateLimit";
 import { generateContent } from "../services/openai";
 import { createPost } from "../services/post";
 
 const router = Router();
 
 router.use(authenticate);
-router.use(generateLimiter);
 
 router.post("/", async (req: Request, res: Response) => {
   try {
