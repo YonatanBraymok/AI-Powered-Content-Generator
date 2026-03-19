@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLogin } from "@/hooks/use-auth";
 import {
@@ -80,7 +81,14 @@ export default function LoginPage() {
             className="w-full"
             disabled={login.isPending}
           >
-            {login.isPending ? "Signing in…" : "Sign in"}
+            {login.isPending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Signing in…
+              </>
+            ) : (
+              "Sign in"
+            )}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}

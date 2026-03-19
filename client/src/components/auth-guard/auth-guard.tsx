@@ -2,9 +2,9 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-auth";
 import { isAuthenticated } from "@/lib/auth";
-import { LoadingSkeleton } from "@/components/loading-skeleton";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -18,7 +18,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [hasToken, isLoading, isError, user, router]);
 
   if (!hasToken || isLoading) {
-    return <LoadingSkeleton count={3} />;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   if (isError || !user) {

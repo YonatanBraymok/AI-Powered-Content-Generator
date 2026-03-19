@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRegister } from "@/hooks/use-auth";
 import {
@@ -105,7 +106,14 @@ export default function RegisterPage() {
             className="w-full"
             disabled={register.isPending}
           >
-            {register.isPending ? "Creating account…" : "Create account"}
+            {register.isPending ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                Creating account…
+              </>
+            ) : (
+              "Create account"
+            )}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}

@@ -27,10 +27,22 @@ function formatDate(dateString: string): string {
 export function PostCard({ post }: PostCardProps) {
   const router = useRouter();
 
+  function navigate() {
+    router.push(`/dashboard/posts/${post.id}`);
+  }
+
   return (
     <Card
-      className="cursor-pointer transition-shadow hover:shadow-md"
-      onClick={() => router.push(`/dashboard/posts/${post.id}`)}
+      role="link"
+      tabIndex={0}
+      className="cursor-pointer transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      onClick={navigate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate();
+        }
+      }}
     >
       <CardHeader>
         <CardTitle className="line-clamp-1">{post.title}</CardTitle>

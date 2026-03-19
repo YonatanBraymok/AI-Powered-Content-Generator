@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Copy, Loader2, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Copy, Loader2, RefreshCw, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { usePost, useUpdatePost, useDeletePost } from "@/hooks/use-posts";
 import {
@@ -30,7 +30,7 @@ interface PostEditorProps {
 
 export function PostEditor({ postId }: PostEditorProps) {
   const router = useRouter();
-  const { data: post, isLoading, isError } = usePost(postId);
+  const { data: post, isLoading, isError, refetch } = usePost(postId);
   const updatePost = useUpdatePost();
   const deletePost = useDeletePost();
 
@@ -38,16 +38,16 @@ export function PostEditor({ postId }: PostEditorProps) {
   const [content, setContent] = useState("");
   const [isPublished, setIsPublished] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [syncedId, setSyncedId] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (post) {
-      setTitle(post.title);
-      setContent(post.content);
-      setIsPublished(post.isPublished);
-      setHasChanges(false);
-    }
-  }, [post]);
+  if (post && syncedId !== post.id) {
+    setSyncedId(post.id);
+    setTitle(post.title);
+    setContent(post.content);
+    setIsPublished(post.isPublished);
+    setHasChanges(false);
+  }
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -100,12 +100,26 @@ export function PostEditor({ postId }: PostEditorProps) {
     });
   }
 
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        if (hasChanges && title.trim() && !updatePost.isPending) {
+          handleSave();
+        }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
   function handleCopyShareLink() {
     if (!post) return;
     const url = `${window.location.origin}/posts/${post.shareId}`;
-    navigator.clipboard.writeText(url).then(() => {
-      toast.success("Share link copied to clipboard!");
-    });
+    navigator.clipboard.writeText(url).then(
+      () => toast.success("Share link copied to clipboard!"),
+      () => toast.error("Failed to copy link — please copy it manually"),
+    );
   }
 
   if (isLoading) {
@@ -120,10 +134,16 @@ export function PostEditor({ postId }: PostEditorProps) {
           The post you&apos;re looking for doesn&apos;t exist or has been
           deleted.
         </p>
-        <Button variant="outline" onClick={() => router.push("/dashboard")}>
-          <ArrowLeft className="size-4" />
-          Back to Dashboard
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="size-4" />
+            Retry
+          </Button>
+          <Button variant="outline" onClick={() => router.push("/dashboard")}>
+            <ArrowLeft className="size-4" />
+            Back to Dashboard
+          </Button>
+        </div>
       </div>
     );
   }

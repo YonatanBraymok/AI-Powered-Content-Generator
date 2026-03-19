@@ -7,7 +7,7 @@ import { EmptyState } from "@/components/empty-state";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 
 export function PostList() {
-  const { data: posts, isLoading, isError } = usePosts();
+  const { data: posts, isLoading, isError, refetch } = usePosts();
 
   if (isLoading) {
     return <LoadingSkeleton count={6} />;
@@ -19,6 +19,8 @@ export function PostList() {
         icon={FileText}
         title="Failed to load posts"
         description="Something went wrong while fetching your posts. Please try again."
+        actionLabel="Retry"
+        onAction={() => refetch()}
       />
     );
   }
