@@ -1,4 +1,4 @@
-const TOKEN_KEY = "auth_token";
+import { TOKEN_KEY } from "@/lib/constants";
 
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;

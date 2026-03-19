@@ -1,18 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { setToken, removeToken, isAuthenticated } from "@/lib/auth";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  createdAt?: string;
-}
-
-interface AuthResponse {
-  token: string;
-  user: User;
-}
+import type { User, AuthResponse } from "@/lib/types";
 
 export function useCurrentUser() {
   return useQuery<User>({

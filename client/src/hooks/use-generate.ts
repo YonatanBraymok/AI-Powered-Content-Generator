@@ -1,12 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import type { Post } from "./use-posts";
-
-interface GenerateInput {
-  topic: string;
-  style: string;
-  title?: string;
-}
+import type { Post, GenerateInput } from "@/lib/types";
 
 export function useGenerateContent() {
   const queryClient = useQueryClient();

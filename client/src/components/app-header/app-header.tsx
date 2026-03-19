@@ -3,6 +3,7 @@
 import { Sparkles, LogOut } from "lucide-react";
 import { useCurrentUser, useLogout } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, Button, Separator } from "@/components/ui";
+import { APP_NAME } from "@/lib/constants";
 
 function getInitials(name: string): string {
   return name
@@ -23,7 +24,7 @@ export function AppHeader() {
         <div className="flex items-center gap-2">
           <Sparkles className="size-5 text-primary" />
           <span className="text-lg font-semibold tracking-tight">
-            AI Content Generator
+            {APP_NAME}
           </span>
         </div>
 
