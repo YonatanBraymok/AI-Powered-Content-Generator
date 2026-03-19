@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { FileText } from "lucide-react";
+import { toast } from "sonner";
 import { usePosts } from "@/hooks/use-posts";
 import { PostCard } from "@/components/post-card";
 import { EmptyState } from "@/components/empty-state";
@@ -8,6 +10,12 @@ import { LoadingSkeleton } from "@/components/loading-skeleton";
 
 export function PostList() {
   const { data: posts, isLoading, isError, refetch } = usePosts();
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Failed to load posts");
+    }
+  }, [isError]);
 
   if (isLoading) {
     return <LoadingSkeleton count={6} />;

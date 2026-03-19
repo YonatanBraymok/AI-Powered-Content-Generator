@@ -31,6 +31,7 @@ export default function LoginPage() {
       { email, password },
       {
         onSuccess: () => {
+          toast.success("Welcome back!");
           router.replace("/dashboard");
         },
         onError: (error: Error) => {

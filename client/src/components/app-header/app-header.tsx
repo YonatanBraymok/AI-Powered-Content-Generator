@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles, LogOut } from "lucide-react";
+import { toast } from "sonner";
 import { useCurrentUser, useLogout } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, Button, Separator } from "@/components/ui";
 import { APP_NAME } from "@/lib/constants";
@@ -39,7 +40,14 @@ export function AppHeader() {
               </span>
             </div>
             <Separator orientation="vertical" className="!h-6" />
-            <Button variant="ghost" size="sm" onClick={logout}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                toast.success("Logged out");
+                logout();
+              }}
+            >
               <LogOut className="size-4" />
               <span className="hidden sm:inline-block">Log out</span>
             </Button>

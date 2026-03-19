@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 import { getToken, removeToken } from "./auth";
 
 const api = axios.create({
@@ -20,6 +21,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       removeToken();
       if (typeof window !== "undefined") {
+        toast.error("Session expired. Please sign in again.");
         window.location.href = "/login";
       }
     }
