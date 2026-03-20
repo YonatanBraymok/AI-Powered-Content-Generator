@@ -25,13 +25,17 @@ services:
       - key: NODE_ENV
         value: production
 
+  # Node (not Docker): `next start` serves App Router + /_next/static correctly on Render.
   - type: web
     name: content-generator-client
     plan: free
-    runtime: docker
-    dockerfilePath: ./client/Dockerfile
-    dockerContext: ./client
+    runtime: node
+    rootDir: client
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: NEXT_PUBLIC_API_URL
         fromService:
           name: content-generator-server

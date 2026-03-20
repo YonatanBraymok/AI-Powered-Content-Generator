@@ -224,3 +224,15 @@ docker compose down -v
 # Rebuild a single service
 docker compose up --build server -d
 ```
+
+## Deploying to Render (Blueprint)
+
+The repo includes [`render.yaml`](render.yaml) for a one-click [Render Blueprint](https://render.com/docs/infrastructure-as-code):
+
+- **PostgreSQL** (`content-generator-db`)
+- **API** (`content-generator-server`) — Docker image from `server/`
+- **Web app** (`content-generator-client`) — **Node** runtime (`npm run build` + `npm start` in `client/`) so Next.js App Router and `/_next/static` assets work reliably
+
+When you apply the Blueprint, set **`GEMINI_API_KEY`** when prompted. After deploy, open the **`content-generator-client`** service URL in the dashboard.
+
+If you change the API URL, redeploy the client so `NEXT_PUBLIC_API_URL` is rebuilt.
