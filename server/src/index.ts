@@ -4,6 +4,11 @@ import cors from "cors";
 import authRoutes from "./routes/auth";
 import postRoutes from "./routes/posts";
 import generateRoutes from "./routes/generate";
+import {
+  generalLimiter,
+  authLimiter,
+  generateLimiter,
+} from "./middleware/rate-limit";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -15,9 +20,10 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/api", generalLimiter);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/posts", postRoutes);
-app.use("/api/generate", generateRoutes);
+app.use("/api/generate", generateLimiter, generateRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
