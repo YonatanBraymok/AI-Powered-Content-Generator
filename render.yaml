@@ -1,0 +1,40 @@
+databases:
+  - name: content-generator-db
+    plan: free
+    databaseName: content_generator
+    user: postgres
+
+services:
+  - type: web
+    name: content-generator-server
+    plan: free
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: content-generator-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: "10000"
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: content-generator-client
+    plan: free
+    runtime: docker
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: ./client
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          name: content-generator-server
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
