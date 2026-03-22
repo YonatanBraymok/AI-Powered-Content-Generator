@@ -1,6 +1,7 @@
 "use client";
 
-import { Sparkles, LogOut } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, LogOut, Settings } from "lucide-react";
 import { useCurrentUser, useLogout } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, Button, Separator } from "@/components/ui";
 import { APP_NAME } from "@/lib/constants";
@@ -39,6 +40,10 @@ export function AppHeader() {
               </span>
             </div>
             <Separator orientation="vertical" className="!h-6" />
+            <Button variant="ghost" size="sm" render={<Link href="/settings" />}>
+              <Settings className="size-4" />
+              <span className="hidden sm:inline-block">Settings</span>
+            </Button>
             <Button
               variant="ghost"
               size="sm"
