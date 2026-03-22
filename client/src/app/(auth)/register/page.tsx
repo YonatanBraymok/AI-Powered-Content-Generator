@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRegister } from "@/hooks/use-auth";
+import type { ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -24,14 +25,11 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
+    setFieldErrors({});
 
     register.mutate(
       { name, email, password },
@@ -41,7 +39,12 @@ export default function RegisterPage() {
           router.replace("/verify-email");
         },
         onError: (error: Error) => {
-          toast.error(error.message || "Registration failed");
+          const apiErr = error as ApiError;
+          if (apiErr.fieldErrors) {
+            setFieldErrors(apiErr.fieldErrors);
+          } else {
+            toast.error(error.message || "Registration failed");
+          }
         },
       },
     );
@@ -69,6 +72,9 @@ export default function RegisterPage() {
               onChange={(e) => setName(e.target.value)}
               disabled={register.isPending}
             />
+            {fieldErrors.name && (
+              <p className="text-sm text-destructive">{fieldErrors.name}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -82,6 +88,9 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={register.isPending}
             />
+            {fieldErrors.email && (
+              <p className="text-sm text-destructive">{fieldErrors.email}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
@@ -96,9 +105,13 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={register.isPending}
             />
-            <p className="text-xs text-muted-foreground">
-              Must be at least 6 characters
-            </p>
+            {fieldErrors.password ? (
+              <p className="text-sm text-destructive">{fieldErrors.password}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Must be at least 6 characters
+              </p>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

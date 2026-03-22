@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import type { ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -21,17 +22,22 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFieldErrors({});
     setIsPending(true);
     try {
       await api.post("/api/auth/forgot-password", { email });
       setSent(true);
     } catch (err: unknown) {
-      const msg =
-        (err as { message?: string })?.message ?? "Something went wrong";
-      toast.error(msg);
+      const apiErr = err as ApiError;
+      if (apiErr.fieldErrors) {
+        setFieldErrors(apiErr.fieldErrors);
+      } else {
+        toast.error(apiErr.message ?? "Something went wrong");
+      }
     } finally {
       setIsPending(false);
     }
@@ -87,6 +93,9 @@ export default function ForgotPasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={isPending}
             />
+            {fieldErrors.email && (
+              <p className="text-sm text-destructive">{fieldErrors.email}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

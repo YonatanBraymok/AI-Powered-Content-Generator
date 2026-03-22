@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLogin } from "@/hooks/use-auth";
+import type { ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -23,9 +24,11 @@ export default function LoginPage() {
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFieldErrors({});
 
     login.mutate(
       { email, password },
@@ -35,7 +38,12 @@ export default function LoginPage() {
           router.replace("/dashboard");
         },
         onError: (error: Error) => {
-          toast.error(error.message || "Invalid email or password");
+          const apiErr = error as ApiError;
+          if (apiErr.fieldErrors) {
+            setFieldErrors(apiErr.fieldErrors);
+          } else {
+            toast.error(error.message || "Invalid email or password");
+          }
         },
       },
     );
@@ -61,6 +69,9 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={login.isPending}
             />
+            {fieldErrors.email && (
+              <p className="text-sm text-destructive">{fieldErrors.email}</p>
+            )}
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -82,6 +93,9 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={login.isPending}
             />
+            {fieldErrors.password && (
+              <p className="text-sm text-destructive">{fieldErrors.password}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

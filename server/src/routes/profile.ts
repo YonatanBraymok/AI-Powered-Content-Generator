@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { z } from "zod";
 import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
 import { sendVerificationEmail } from "../lib/email";
@@ -9,11 +10,38 @@ import logger from "../lib/logger";
 const router = Router();
 const IS_PROD = process.env.NODE_ENV === "production";
 
+function zodFieldErrors(error: z.ZodError): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const field = issue.path[0];
+    if (field !== undefined && !result[String(field)]) {
+      result[String(field)] = issue.message;
+    }
+  }
+  return result;
+}
+
+const updateProfileSchema = z.object({
+  name: z.string().min(1, "Name is required").optional(),
+  email: z.string().email("Invalid email address").optional(),
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+});
+
 router.use(authenticate);
 
 router.patch("/", async (req: Request, res: Response) => {
   try {
-    const { name, email } = req.body;
+    const parsed = updateProfileSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ errors: zodFieldErrors(parsed.error) });
+      return;
+    }
+
+    const { name, email } = parsed.data;
     const userId = req.user!.userId;
 
     if (!name && !email) {
@@ -29,12 +57,11 @@ router.patch("/", async (req: Request, res: Response) => {
 
     const updates: Record<string, unknown> = {};
 
-    if (name && typeof name === "string" && name.trim()) {
+    if (name && name.trim()) {
       updates.name = name.trim();
     }
 
-    const emailChanged =
-      email && typeof email === "string" && email !== current.email;
+    const emailChanged = email && email !== current.email;
 
     if (emailChanged) {
       const existing = await prisma.user.findUnique({ where: { email } });
@@ -79,20 +106,14 @@ router.patch("/", async (req: Request, res: Response) => {
 
 router.patch("/password", async (req: Request, res: Response) => {
   try {
-    const { currentPassword, newPassword } = req.body;
+    const parsed = changePasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ errors: zodFieldErrors(parsed.error) });
+      return;
+    }
+
+    const { currentPassword, newPassword } = parsed.data;
     const userId = req.user!.userId;
-
-    if (!currentPassword || !newPassword) {
-      res.status(400).json({ error: "Current and new password are required" });
-      return;
-    }
-
-    if (typeof newPassword !== "string" || newPassword.length < 6) {
-      res
-        .status(400)
-        .json({ error: "New password must be at least 6 characters" });
-      return;
-    }
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {

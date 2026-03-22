@@ -1,6 +1,12 @@
 import axios from "axios";
 import { toast } from "sonner";
 
+export type ApiFieldErrors = Record<string, string>;
+
+export interface ApiError extends Error {
+  fieldErrors?: ApiFieldErrors;
+}
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000",
   headers: { "Content-Type": "application/json" },
@@ -56,6 +62,11 @@ api.interceptors.response.use(
       error.response?.data?.message ?? error.response?.data?.error;
     if (serverMessage) {
       error.message = serverMessage;
+    }
+
+    const serverFieldErrors = error.response?.data?.errors as ApiFieldErrors | undefined;
+    if (serverFieldErrors) {
+      (error as ApiError).fieldErrors = serverFieldErrors;
     }
 
     return Promise.reject(error);
