@@ -14,20 +14,15 @@ declare global {
 }
 
 export function authenticate(req: Request, res: Response, next: NextFunction) {
-  const header = req.headers.authorization;
+  const token = req.cookies?.access_token;
 
-  if (!header?.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Missing or invalid authorization header" });
+  if (!token) {
+    res.status(401).json({ error: "Not authenticated" });
     return;
   }
 
-  const token = header.split(" ")[1];
-
   try {
-    const payload = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as AuthPayload;
+    const payload = jwt.verify(token, process.env.JWT_SECRET!) as AuthPayload;
     req.user = payload;
     next();
   } catch {
