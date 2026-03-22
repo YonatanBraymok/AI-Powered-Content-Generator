@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth";
 import postRoutes from "./routes/posts";
 import generateRoutes from "./routes/generate";
+import profileRoutes from "./routes/profile";
 import {
   generalLimiter,
   authLimiter,
@@ -32,6 +33,7 @@ app.use("/api", generalLimiter);
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/generate", generateLimiter, generateRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
