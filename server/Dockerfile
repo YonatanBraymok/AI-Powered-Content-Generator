@@ -21,4 +21,4 @@ COPY --from=build /app/prisma.config.ts ./prisma.config.ts
 COPY package.json ./
 
 EXPOSE 4000
-CMD ["sh", "-c", "npx prisma db push && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/index.js"]

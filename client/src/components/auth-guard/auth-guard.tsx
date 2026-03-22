@@ -10,8 +10,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading, isError } = useCurrentUser();
 
   useEffect(() => {
-    if (!isLoading && (isError || !user)) {
+    if (isLoading) return;
+    if (isError || !user) {
       router.replace("/login");
+    } else if (!user.isEmailVerified) {
+      router.replace("/verify-email");
     }
   }, [isLoading, isError, user, router]);
 
@@ -23,7 +26,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (isError || !user) {
+  if (isError || !user || !user.isEmailVerified) {
     return null;
   }
 
