@@ -20,3 +20,10 @@ export const generateLimiter = rateLimit({
   standardHeaders: "draft-7",
   legacyHeaders: false,
 });
+
+export const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+});

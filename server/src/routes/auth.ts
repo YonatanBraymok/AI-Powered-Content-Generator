@@ -4,8 +4,9 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
+import { passwordResetLimiter } from "../middleware/rate-limit";
 import logger from "../lib/logger";
-import { sendVerificationEmail } from "../lib/email";
+import { sendVerificationEmail, sendPasswordResetEmail } from "../lib/email";
 
 const router = Router();
 
@@ -281,6 +282,91 @@ router.post("/resend-verification", authenticate, async (req: Request, res: Resp
     res.json({ ok: true });
   } catch (error) {
     logger.error({ err: error, route: "POST /resend-verification" }, "Resend verification error");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/forgot-password", passwordResetLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || typeof email !== "string") {
+      res.status(400).json({ error: "Email is required" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    // Always respond with the same message to avoid leaking whether the email exists
+    if (!user) {
+      res.json({ ok: true });
+      return;
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordResetToken: resetToken,
+        passwordResetExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+      },
+    });
+
+    sendPasswordResetEmail(user.email, resetToken).catch((err) => {
+      logger.error({ err, userId: user.id }, "Failed to send password reset email");
+    });
+
+    logger.info({ userId: user.id }, "Password reset email requested");
+    res.json({ ok: true });
+  } catch (error) {
+    logger.error({ err: error, route: "POST /forgot-password" }, "Forgot password error");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/reset-password", async (req: Request, res: Response) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || typeof token !== "string") {
+      res.status(400).json({ error: "Reset token is required" });
+      return;
+    }
+
+    if (!password || typeof password !== "string" || password.length < 6) {
+      res.status(400).json({ error: "Password must be at least 6 characters" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { passwordResetToken: token },
+    });
+
+    if (!user || !user.passwordResetExpiry || user.passwordResetExpiry < new Date()) {
+      res.status(400).json({ error: "Invalid or expired reset token" });
+      return;
+    }
+
+    const hashed = await bcrypt.hash(password, 12);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashed,
+          passwordResetToken: null,
+          passwordResetExpiry: null,
+        },
+      }),
+      prisma.refreshToken.deleteMany({ where: { userId: user.id } }),
+    ]);
+
+    clearAuthCookies(res);
+    logger.info({ userId: user.id }, "Password reset successful");
+    res.json({ ok: true });
+  } catch (error) {
+    logger.error({ err: error, route: "POST /reset-password" }, "Reset password error");
     res.status(500).json({ error: "Internal server error" });
   }
 });
