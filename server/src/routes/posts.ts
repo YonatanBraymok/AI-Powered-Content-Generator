@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { authenticate } from "../middleware/auth";
+import { authenticate, requireEmailVerified } from "../middleware/auth";
 import {
   getUserPosts,
   getPostById,
@@ -25,6 +25,7 @@ router.get("/shared/:shareId", async (req: Request, res: Response) => {
 });
 
 router.use(authenticate);
+router.use(requireEmailVerified);
 
 router.get("/", async (req: Request, res: Response) => {
   try {

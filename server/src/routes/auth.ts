@@ -5,6 +5,7 @@ import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
 import logger from "../lib/logger";
+import { sendVerificationEmail } from "../lib/email";
 
 const router = Router();
 
@@ -81,8 +82,20 @@ router.post("/register", async (req: Request, res: Response) => {
     }
 
     const hashed = await bcrypt.hash(password, 12);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
     const user = await prisma.user.create({
-      data: { email, password: hashed, name },
+      data: {
+        email,
+        password: hashed,
+        name,
+        emailVerificationToken: verificationToken,
+        emailVerificationExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+
+    sendVerificationEmail(user.email, verificationToken).catch((err) => {
+      logger.error({ err, userId: user.id }, "Failed to send verification email after register");
     });
 
     await issueTokens(res, user.id);
@@ -184,6 +197,81 @@ router.post("/logout", async (req: Request, res: Response) => {
     res.json({ ok: true });
   } catch (error) {
     logger.error({ err: error, route: "POST /logout" }, "Logout error");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/verify-email", async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+
+    if (!token || typeof token !== "string") {
+      res.status(400).json({ error: "Invalid or missing token" });
+      return;
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { emailVerificationToken: token },
+    });
+
+    if (
+      !user ||
+      !user.emailVerificationExpiry ||
+      user.emailVerificationExpiry < new Date()
+    ) {
+      res.status(400).json({ error: "Invalid or expired verification token" });
+      return;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isEmailVerified: true,
+        emailVerificationToken: null,
+        emailVerificationExpiry: null,
+      },
+    });
+
+    logger.info({ userId: user.id }, "Email verified");
+    res.json({ ok: true });
+  } catch (error) {
+    logger.error({ err: error, route: "GET /verify-email" }, "Verify email error");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/resend-verification", authenticate, async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (user.isEmailVerified) {
+      res.status(400).json({ error: "Email is already verified" });
+      return;
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        emailVerificationToken: verificationToken,
+        emailVerificationExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+
+    await sendVerificationEmail(user.email, verificationToken);
+
+    logger.info({ userId: user.id }, "Verification email resent");
+    res.json({ ok: true });
+  } catch (error) {
+    logger.error({ err: error, route: "POST /resend-verification" }, "Resend verification error");
     res.status(500).json({ error: "Internal server error" });
   }
 });

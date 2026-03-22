@@ -1,11 +1,12 @@
 import { Router, Request, Response } from "express";
-import { authenticate } from "../middleware/auth";
+import { authenticate, requireEmailVerified } from "../middleware/auth";
 import { generateContent } from "../services/openai";
 import { createPost } from "../services/post";
 
 const router = Router();
 
 router.use(authenticate);
+router.use(requireEmailVerified);
 
 router.post("/", async (req: Request, res: Response) => {
   try {

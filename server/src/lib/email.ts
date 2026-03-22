@@ -4,7 +4,7 @@ import logger from "./logger";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_ADDRESS =
-  process.env.EMAIL_FROM ?? "noreply@yourdomain.com";
+  process.env.FROM_EMAIL ?? "noreply@yourdomain.com";
 
 const APP_URL = process.env.APP_URL ?? "http://localhost:3000";
 

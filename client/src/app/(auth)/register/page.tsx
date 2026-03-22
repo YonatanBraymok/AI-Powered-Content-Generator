@@ -37,8 +37,8 @@ export default function RegisterPage() {
       { name, email, password },
       {
         onSuccess: () => {
-          toast.success("Account created!");
-          router.replace("/dashboard");
+          toast.success("Account created! Please verify your email.");
+          router.replace("/verify-email");
         },
         onError: (error: Error) => {
           toast.error(error.message || "Registration failed");
