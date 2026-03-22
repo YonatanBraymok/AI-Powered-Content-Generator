@@ -25,22 +25,31 @@ function setAuthCookies(
   res.cookie("access_token", accessToken, {
     httpOnly: true,
     secure: IS_PROD,
-    sameSite: "lax",
+    sameSite: IS_PROD ? "none" : "lax",
     maxAge: ACCESS_TOKEN_TTL_MS,
   });
 
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
     secure: IS_PROD,
-    sameSite: "lax",
+    sameSite: IS_PROD ? "none" : "lax",
     maxAge: REFRESH_TOKEN_TTL_MS,
     path: "/api/auth",
   });
 }
 
 function clearAuthCookies(res: Response) {
-  res.clearCookie("access_token");
-  res.clearCookie("refresh_token", { path: "/api/auth" });
+  res.clearCookie("access_token", {
+    httpOnly: true,
+    secure: IS_PROD,
+    sameSite: IS_PROD ? "none" : "lax",
+  });
+  res.clearCookie("refresh_token", {
+    httpOnly: true,
+    secure: IS_PROD,
+    sameSite: IS_PROD ? "none" : "lax",
+    path: "/api/auth",
+  });
 }
 
 async function issueTokens(
