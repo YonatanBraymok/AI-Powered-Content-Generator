@@ -8,12 +8,27 @@ datasource db {
 }
 
 model User {
+  id                      String         @id @default(cuid())
+  email                   String         @unique
+  password                String
+  name                    String
+  createdAt               DateTime       @default(now())
+  isEmailVerified         Boolean        @default(false)
+  emailVerificationToken  String?        @unique
+  emailVerificationExpiry DateTime?
+  passwordResetToken      String?        @unique
+  passwordResetExpiry     DateTime?
+  posts                   Post[]
+  refreshTokens           RefreshToken[]
+}
+
+model RefreshToken {
   id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
   createdAt DateTime @default(now())
-  posts     Post[]
 }
 
 model Post {
