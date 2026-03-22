@@ -7,6 +7,7 @@ import {
   updatePost,
   deletePost,
 } from "../services/post";
+import logger from "../lib/logger";
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get("/shared/:shareId", async (req: Request, res: Response) => {
     }
     res.json({ post });
   } catch (error) {
-    console.error("Shared post error:", error);
+    logger.error({ err: error, route: "GET /posts/shared/:shareId" }, "Shared post error");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -32,7 +33,7 @@ router.get("/", async (req: Request, res: Response) => {
     const posts = await getUserPosts(req.user!.userId);
     res.json({ posts });
   } catch (error) {
-    console.error("List posts error:", error);
+    logger.error({ err: error, route: "GET /posts", userId: req.user?.userId }, "List posts error");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -46,7 +47,7 @@ router.get("/:id", async (req: Request, res: Response) => {
     }
     res.json({ post });
   } catch (error) {
-    console.error("Get post error:", error);
+    logger.error({ err: error, route: "GET /posts/:id", userId: req.user?.userId }, "Get post error");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -67,7 +68,7 @@ router.patch("/:id", async (req: Request, res: Response) => {
 
     res.json({ post });
   } catch (error) {
-    console.error("Update post error:", error);
+    logger.error({ err: error, route: "PATCH /posts/:id", userId: req.user?.userId }, "Update post error");
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -81,7 +82,7 @@ router.delete("/:id", async (req: Request, res: Response) => {
     }
     res.json({ message: "Post deleted" });
   } catch (error) {
-    console.error("Delete post error:", error);
+    logger.error({ err: error, route: "DELETE /posts/:id", userId: req.user?.userId }, "Delete post error");
     res.status(500).json({ error: "Internal server error" });
   }
 });

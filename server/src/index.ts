@@ -11,6 +11,7 @@ import {
   authLimiter,
   generateLimiter,
 } from "./middleware/rate-limit";
+import logger from "./lib/logger";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -36,7 +37,7 @@ app.use("/api/generate", generateLimiter, generateRoutes);
 app.use("/api/profile", profileRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  logger.info({ port: PORT }, "Server running");
 });
 
 export default app;

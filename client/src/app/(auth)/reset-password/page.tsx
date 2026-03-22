@@ -6,6 +6,7 @@ import Link from "next/link";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import type { ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -41,7 +42,7 @@ function ResetPasswordContent() {
   const [confirm, setConfirm] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [done, setDone] = useState(false);
-  const [fieldError, setFieldError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   if (!token) {
     return (
@@ -66,15 +67,15 @@ function ResetPasswordContent() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setFieldError("");
+    setFieldErrors({});
 
     if (password !== confirm) {
-      setFieldError("Passwords do not match");
+      setFieldErrors({ confirm: "Passwords do not match" });
       return;
     }
 
     if (password.length < 6) {
-      setFieldError("Password must be at least 6 characters");
+      setFieldErrors({ password: "Password must be at least 6 characters" });
       return;
     }
 
@@ -84,9 +85,12 @@ function ResetPasswordContent() {
       setDone(true);
       setTimeout(() => router.replace("/login"), 2500);
     } catch (err: unknown) {
-      const msg =
-        (err as { message?: string })?.message ?? "Failed to reset password";
-      toast.error(msg);
+      const apiErr = err as ApiError;
+      if (apiErr.fieldErrors) {
+        setFieldErrors(apiErr.fieldErrors);
+      } else {
+        toast.error(apiErr.message ?? "Failed to reset password");
+      }
     } finally {
       setIsPending(false);
     }
@@ -128,6 +132,9 @@ function ResetPasswordContent() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={isPending}
             />
+            {fieldErrors.password && (
+              <p className="text-sm text-destructive">{fieldErrors.password}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirm">Confirm new password</Label>
@@ -141,8 +148,8 @@ function ResetPasswordContent() {
               onChange={(e) => setConfirm(e.target.value)}
               disabled={isPending}
             />
-            {fieldError && (
-              <p className="text-sm text-destructive">{fieldError}</p>
+            {fieldErrors.confirm && (
+              <p className="text-sm text-destructive">{fieldErrors.confirm}</p>
             )}
           </div>
         </CardContent>

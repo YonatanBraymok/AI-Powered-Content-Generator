@@ -10,6 +10,7 @@ import {
   useChangePassword,
   useDeleteAccount,
 } from "@/hooks/use-profile";
+import type { ApiError } from "@/lib/api";
 import {
   Button,
   Card,
@@ -36,9 +37,11 @@ function ProfileSection() {
 
   const [name, setName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFieldErrors({});
 
     const payload: { name?: string; email?: string } = {};
     if (name !== user?.name) payload.name = name;
@@ -54,7 +57,12 @@ function ProfileSection() {
         toast.success("Profile updated.");
       },
       onError: (err: Error) => {
-        toast.error(err.message || "Failed to update profile.");
+        const apiErr = err as ApiError;
+        if (apiErr.fieldErrors) {
+          setFieldErrors(apiErr.fieldErrors);
+        } else {
+          toast.error(err.message || "Failed to update profile.");
+        }
       },
     });
   }
@@ -77,6 +85,9 @@ function ProfileSection() {
               onChange={(e) => setName(e.target.value)}
               disabled={updateProfile.isPending}
             />
+            {fieldErrors.name && (
+              <p className="text-sm text-destructive">{fieldErrors.name}</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="profile-email">Email</Label>
@@ -88,11 +99,13 @@ function ProfileSection() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={updateProfile.isPending}
             />
-            {email !== user?.email && (
+            {fieldErrors.email ? (
+              <p className="text-sm text-destructive">{fieldErrors.email}</p>
+            ) : email !== user?.email ? (
               <p className="text-xs text-muted-foreground">
                 Changing your email will require re-verification.
               </p>
-            )}
+            ) : null}
           </div>
         </CardContent>
         <CardFooter>
@@ -118,21 +131,24 @@ function PasswordSection() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   function handleToggle() {
     if (expanded) {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      setFieldErrors({});
     }
     setExpanded((v) => !v);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setFieldErrors({});
 
     if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match.");
+      setFieldErrors({ confirmPassword: "New passwords do not match." });
       return;
     }
 
@@ -147,7 +163,12 @@ function PasswordSection() {
           setExpanded(false);
         },
         onError: (err: Error) => {
-          toast.error(err.message || "Failed to change password.");
+          const apiErr = err as ApiError;
+          if (apiErr.fieldErrors) {
+            setFieldErrors(apiErr.fieldErrors);
+          } else {
+            toast.error(err.message || "Failed to change password.");
+          }
         },
       },
     );
@@ -200,6 +221,9 @@ function PasswordSection() {
                 disabled={changePassword.isPending}
                 required
               />
+              {fieldErrors.currentPassword && (
+                <p className="text-sm text-destructive">{fieldErrors.currentPassword}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="new-password">New password</Label>
@@ -214,6 +238,9 @@ function PasswordSection() {
                 required
                 minLength={6}
               />
+              {fieldErrors.newPassword && (
+                <p className="text-sm text-destructive">{fieldErrors.newPassword}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm new password</Label>
@@ -228,6 +255,9 @@ function PasswordSection() {
                 required
                 minLength={6}
               />
+              {fieldErrors.confirmPassword && (
+                <p className="text-sm text-destructive">{fieldErrors.confirmPassword}</p>
+              )}
             </div>
           </CardContent>
           <CardFooter>

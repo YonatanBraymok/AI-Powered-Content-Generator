@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { z } from "zod";
 import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
 import { passwordResetLimiter } from "../middleware/rate-limit";
@@ -9,6 +10,37 @@ import logger from "../lib/logger";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../lib/email";
 
 const router = Router();
+
+function zodFieldErrors(error: z.ZodError): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const field = issue.path[0];
+    if (field !== undefined && !result[String(field)]) {
+      result[String(field)] = issue.message;
+    }
+  }
+  return result;
+}
+
+const registerSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
 const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -78,12 +110,13 @@ async function issueTokens(
 
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = req.body;
-
-    if (!email || !password || !name) {
-      res.status(400).json({ error: "Email, password, and name are required" });
+    const parsed = registerSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ errors: zodFieldErrors(parsed.error) });
       return;
     }
+
+    const { email, password, name } = parsed.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -126,12 +159,13 @@ router.post("/register", async (req: Request, res: Response) => {
 
 router.post("/login", async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      res.status(400).json({ error: "Email and password are required" });
+    const parsed = loginSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ errors: zodFieldErrors(parsed.error) });
       return;
     }
+
+    const { email, password } = parsed.data;
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
@@ -288,12 +322,13 @@ router.post("/resend-verification", authenticate, async (req: Request, res: Resp
 
 router.post("/forgot-password", passwordResetLimiter, async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-
-    if (!email || typeof email !== "string") {
-      res.status(400).json({ error: "Email is required" });
+    const parsed = forgotPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ errors: zodFieldErrors(parsed.error) });
       return;
     }
+
+    const { email } = parsed.data;
 
     const user = await prisma.user.findUnique({ where: { email } });
 
@@ -327,17 +362,13 @@ router.post("/forgot-password", passwordResetLimiter, async (req: Request, res: 
 
 router.post("/reset-password", async (req: Request, res: Response) => {
   try {
-    const { token, password } = req.body;
-
-    if (!token || typeof token !== "string") {
-      res.status(400).json({ error: "Reset token is required" });
+    const parsed = resetPasswordSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ errors: zodFieldErrors(parsed.error) });
       return;
     }
 
-    if (!password || typeof password !== "string" || password.length < 6) {
-      res.status(400).json({ error: "Password must be at least 6 characters" });
-      return;
-    }
+    const { token, password } = parsed.data;
 
     const user = await prisma.user.findUnique({
       where: { passwordResetToken: token },
