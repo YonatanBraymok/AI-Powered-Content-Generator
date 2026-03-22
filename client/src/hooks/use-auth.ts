@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { setToken, removeToken, isAuthenticated } from "@/lib/auth";
-import type { User, AuthResponse } from "@/lib/types";
+import type { AuthResponse, User } from "@/lib/types";
 
 export function useCurrentUser() {
   return useQuery<User>({
@@ -10,7 +9,7 @@ export function useCurrentUser() {
       const { data } = await api.get<{ user: User }>("/api/auth/me");
       return data.user;
     },
-    enabled: isAuthenticated(),
+    retry: false,
   });
 }
 
@@ -26,7 +25,6 @@ export function useLogin() {
       return data;
     },
     onSuccess: (data) => {
-      setToken(data.token);
       queryClient.setQueryData(["currentUser"], data.user);
     },
   });
@@ -48,7 +46,6 @@ export function useRegister() {
       return data;
     },
     onSuccess: (data) => {
-      setToken(data.token);
       queryClient.setQueryData(["currentUser"], data.user);
     },
   });
@@ -57,9 +54,13 @@ export function useRegister() {
 export function useLogout() {
   const queryClient = useQueryClient();
 
-  return () => {
-    removeToken();
-    queryClient.clear();
-    window.location.href = "/login";
-  };
+  return useMutation({
+    mutationFn: async () => {
+      await api.post("/api/auth/logout");
+    },
+    onSettled: () => {
+      queryClient.clear();
+      window.location.href = "/login";
+    },
+  });
 }

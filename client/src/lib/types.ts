@@ -3,10 +3,10 @@ export interface User {
   email: string;
   name: string;
   createdAt?: string;
+  isEmailVerified: boolean;
 }
 
 export interface AuthResponse {
-  token: string;
   user: User;
 }
 

@@ -1,18 +1,9 @@
-import { TOKEN_KEY } from "@/lib/constants";
-
-export function getToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function removeToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
-}
+// Auth state is managed via httpOnly cookies set by the server.
+// Use useCurrentUser() to determine if the user is authenticated.
 
 export function isAuthenticated(): boolean {
-  return getToken() !== null;
+  // Cookies are httpOnly and not readable from JS.
+  // Always return true so useCurrentUser always runs; the query result
+  // determines actual auth state.
+  return true;
 }
