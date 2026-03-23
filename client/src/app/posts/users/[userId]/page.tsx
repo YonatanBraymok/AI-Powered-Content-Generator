@@ -1,0 +1,188 @@
+"use client";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import {
+  AlertCircle,
+  Calendar,
+  FileText,
+  Sparkles,
+  User,
+} from "lucide-react";
+import { usePublishedPostsByUser } from "@/hooks/use-posts";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Separator,
+  Skeleton,
+} from "@/components/ui";
+import { APP_NAME } from "@/lib/constants";
+
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export default function PublisherPostsPage() {
+  const { userId } = useParams<{ userId: string }>();
+  const { data, isLoading, isError, refetch } = usePublishedPostsByUser(userId);
+
+  if (isLoading) {
+    return (
+      <PublisherPostsShell>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-60" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <Separator />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Skeleton className="h-44 w-full" />
+            <Skeleton className="h-44 w-full" />
+            <Skeleton className="h-44 w-full" />
+            <Skeleton className="h-44 w-full" />
+          </div>
+        </div>
+      </PublisherPostsShell>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <PublisherPostsShell>
+        <div className="flex flex-col items-center gap-4 py-16 text-center">
+          <div className="rounded-full bg-destructive/10 p-4">
+            <AlertCircle className="size-8 text-destructive" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold">Publisher page unavailable</h2>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              We could not load this publisher&apos;s public posts. It may not
+              exist or no longer have published content.
+            </p>
+          </div>
+          <Button variant="outline" className="mt-2" onClick={() => refetch()}>
+            Try again
+          </Button>
+        </div>
+      </PublisherPostsShell>
+    );
+  }
+
+  if (data.posts.length === 0) {
+    return (
+      <PublisherPostsShell>
+        <div className="space-y-6">
+          <header className="space-y-3">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              {data.user.name}&apos;s Published Posts
+            </h1>
+            <p className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="size-4" />
+              {data.user.name}
+            </p>
+          </header>
+          <Separator />
+          <div className="flex flex-col items-center gap-3 py-12 text-center">
+            <div className="rounded-full bg-muted p-3">
+              <FileText className="size-6 text-muted-foreground" />
+            </div>
+            <h2 className="text-lg font-semibold">No published posts yet</h2>
+            <p className="max-w-md text-sm text-muted-foreground">
+              This publisher has not shared any public posts.
+            </p>
+          </div>
+        </div>
+      </PublisherPostsShell>
+    );
+  }
+
+  return (
+    <PublisherPostsShell>
+      <div className="space-y-6">
+        <header className="space-y-3">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            {data.user.name}&apos;s Published Posts
+          </h1>
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <User className="size-4" />
+            {data.posts.length} public{" "}
+            {data.posts.length === 1 ? "post" : "posts"}
+          </p>
+        </header>
+
+        <Separator />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {data.posts.map((post) => (
+            <Link key={post.id} href={`/posts/${post.shareId}`} className="group">
+              <Card className="h-full transition-shadow group-hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="line-clamp-2">{post.title}</CardTitle>
+                  <CardDescription className="line-clamp-1">
+                    {post.topic}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <p className="line-clamp-3 text-sm text-muted-foreground">
+                    {post.content}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="secondary">{post.style}</Badge>
+                    <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar className="size-3" />
+                      {formatDate(post.createdAt)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </PublisherPostsShell>
+  );
+}
+
+function PublisherPostsShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Sparkles className="size-4" />
+            <span className="text-sm font-medium">{APP_NAME}</span>
+          </Link>
+          <Button variant="outline" size="sm" render={<Link href="/register" />}>
+            Get Started
+          </Button>
+        </div>
+      </header>
+
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+        {children}
+      </main>
+
+      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
+        Powered by{" "}
+        <Link
+          href="/register"
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
+          {APP_NAME}
+        </Link>
+      </footer>
+    </div>
+  );
+}
