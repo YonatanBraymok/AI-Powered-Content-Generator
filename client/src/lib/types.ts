@@ -21,7 +21,18 @@ export interface Post {
   userId: string;
   createdAt: string;
   updatedAt: string;
-  user?: { name: string };
+  user?: {
+    id?: string;
+    name: string;
+  };
+}
+
+export interface PublishedPostsByUserResponse {
+  user: {
+    id: string;
+    name: string;
+  };
+  posts: Post[];
 }
 
 export interface GenerateInput {

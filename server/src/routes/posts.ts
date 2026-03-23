@@ -1,9 +1,11 @@
 import { Router, Request, Response } from "express";
 import { authenticate, requireEmailVerified } from "../middleware/auth";
+import prisma from "../lib/prisma";
 import {
   getUserPosts,
   getPostById,
   getPostByShareId,
+  getPublishedPostsByUser,
   updatePost,
   deletePost,
 } from "../services/post";
@@ -21,6 +23,32 @@ router.get("/shared/:shareId", async (req: Request, res: Response) => {
     res.json({ post });
   } catch (error) {
     logger.error({ err: error, route: "GET /posts/shared/:shareId" }, "Shared post error");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/users/:userId/published", async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId as string;
+    const [user, posts] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, name: true },
+      }),
+      getPublishedPostsByUser(userId),
+    ]);
+
+    if (!user || posts.length === 0) {
+      res.status(404).json({ error: "Publisher published posts not found" });
+      return;
+    }
+
+    res.json({ user, posts });
+  } catch (error) {
+    logger.error(
+      { err: error, route: "GET /posts/users/:userId/published", userId: req.params.userId },
+      "Get publisher published posts error"
+    );
     res.status(500).json({ error: "Internal server error" });
   }
 });

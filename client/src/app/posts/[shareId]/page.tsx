@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle, Calendar, Sparkles, User } from "lucide-react";
+import { useCurrentUser } from "@/hooks/use-auth";
 import { useSharedPost } from "@/hooks/use-posts";
 import { Badge, Button, Separator, Skeleton } from "@/components/ui";
 import { APP_NAME } from "@/lib/constants";
@@ -18,6 +19,7 @@ function formatDate(dateString: string): string {
 export default function SharedPostPage() {
   const { shareId } = useParams<{ shareId: string }>();
   const { data: post, isLoading, isError } = useSharedPost(shareId);
+  const { data: currentUser } = useCurrentUser();
 
   if (isLoading) {
     return (
@@ -67,6 +69,9 @@ export default function SharedPostPage() {
     );
   }
 
+  const isAuthenticated = !!currentUser;
+  const publisherUserId = post.user?.id ?? post.userId;
+
   return (
     <SharedPostShell>
       <article className="space-y-6">
@@ -78,7 +83,16 @@ export default function SharedPostPage() {
             {post.user?.name && (
               <span className="flex items-center gap-1.5">
                 <User className="size-3.5" />
-                {post.user.name}
+                {isAuthenticated && publisherUserId ? (
+                  <Link
+                    href={`/posts/users/${publisherUserId}`}
+                    className="font-medium text-foreground underline-offset-4 hover:underline"
+                  >
+                    {post.user.name}
+                  </Link>
+                ) : (
+                  post.user.name
+                )}
               </span>
             )}
             <span className="flex items-center gap-1.5">
