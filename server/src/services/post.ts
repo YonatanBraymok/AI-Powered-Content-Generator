@@ -28,6 +28,14 @@ export async function getPostByShareId(shareId: string) {
   });
 }
 
+export async function getPublishedPostsByUser(userId: string) {
+  return prisma.post.findMany({
+    where: { userId, isPublished: true },
+    orderBy: { createdAt: "desc" },
+    include: { user: { select: { id: true, name: true } } },
+  });
+}
+
 export async function updatePost(
   id: string,
   userId: string,
