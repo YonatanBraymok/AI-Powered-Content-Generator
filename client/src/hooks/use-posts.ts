@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
-import type { Post } from "@/lib/types";
+import type { Post, PublishedPostsByUserResponse } from "@/lib/types";
 
 export function usePosts() {
   return useQuery<Post[]>({
@@ -33,6 +33,19 @@ export function useSharedPost(shareId: string) {
       return data.post;
     },
     enabled: !!shareId,
+  });
+}
+
+export function usePublishedPostsByUser(userId: string) {
+  return useQuery<PublishedPostsByUserResponse>({
+    queryKey: ["posts", "users", userId, "published"],
+    queryFn: async () => {
+      const { data } = await api.get<PublishedPostsByUserResponse>(
+        `/api/posts/users/${userId}/published`,
+      );
+      return data;
+    },
+    enabled: !!userId,
   });
 }
 
