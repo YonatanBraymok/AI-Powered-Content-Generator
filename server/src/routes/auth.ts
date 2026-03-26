@@ -22,10 +22,18 @@ function zodFieldErrors(error: z.ZodError): Record<string, string> {
   return result;
 }
 
+const strongPassword = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
+
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: strongPassword,
 });
 
 const loginSchema = z.object({
@@ -39,7 +47,7 @@ const forgotPasswordSchema = z.object({
 
 const resetPasswordSchema = z.object({
   token: z.string().min(1, "Reset token is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: strongPassword,
 });
 
 const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes

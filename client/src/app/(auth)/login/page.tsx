@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLogin } from "@/hooks/use-auth";
 import type { ApiError } from "@/lib/api";
+import { validateEmail } from "@/lib/validation";
 import {
   Button,
   Card,
@@ -30,6 +31,16 @@ export default function LoginPage() {
     e.preventDefault();
     setFieldErrors({});
 
+    const errors: Record<string, string> = {};
+    const emailErr = validateEmail(email);
+    if (emailErr) errors.email = emailErr;
+    if (!password) errors.password = "Password is required";
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below.");
+      return;
+    }
+
     login.mutate(
       { email, password },
       {
@@ -41,6 +52,7 @@ export default function LoginPage() {
           const apiErr = error as ApiError;
           if (apiErr.fieldErrors) {
             setFieldErrors(apiErr.fieldErrors);
+            toast.error("Please fix the errors below.");
           } else {
             toast.error(error.message || "Invalid email or password");
           }
@@ -55,7 +67,7 @@ export default function LoginPage() {
         <CardTitle className="text-xl">Welcome back</CardTitle>
         <CardDescription>Sign in to your account to continue</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -63,7 +75,6 @@ export default function LoginPage() {
               id="email"
               type="email"
               placeholder="you@example.com"
-              required
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -87,7 +98,6 @@ export default function LoginPage() {
               id="password"
               type="password"
               placeholder="••••••••"
-              required
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

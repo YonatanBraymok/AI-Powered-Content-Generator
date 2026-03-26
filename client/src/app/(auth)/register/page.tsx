@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRegister } from "@/hooks/use-auth";
 import type { ApiError } from "@/lib/api";
+import { validateEmail, validatePassword } from "@/lib/validation";
 import {
   Button,
   Card,
@@ -31,6 +32,19 @@ export default function RegisterPage() {
     e.preventDefault();
     setFieldErrors({});
 
+    const errors: Record<string, string> = {};
+    if (!name.trim()) errors.name = "Name is required";
+    const emailErr = validateEmail(email);
+    if (emailErr) errors.email = emailErr;
+    const passwordErr = validatePassword(password);
+    if (passwordErr) errors.password = passwordErr;
+
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below.");
+      return;
+    }
+
     register.mutate(
       { name, email, password },
       {
@@ -42,6 +56,7 @@ export default function RegisterPage() {
           const apiErr = error as ApiError;
           if (apiErr.fieldErrors) {
             setFieldErrors(apiErr.fieldErrors);
+            toast.error("Please fix the errors below.");
           } else {
             toast.error(error.message || "Registration failed");
           }
@@ -58,7 +73,7 @@ export default function RegisterPage() {
           Get started with AI-powered content generation
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
@@ -66,7 +81,6 @@ export default function RegisterPage() {
               id="name"
               type="text"
               placeholder="Your name"
-              required
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -82,7 +96,6 @@ export default function RegisterPage() {
               id="email"
               type="email"
               placeholder="you@example.com"
-              required
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -98,8 +111,6 @@ export default function RegisterPage() {
               id="password"
               type="password"
               placeholder="••••••••"
-              required
-              minLength={6}
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -109,7 +120,7 @@ export default function RegisterPage() {
               <p className="text-sm text-destructive">{fieldErrors.password}</p>
             ) : (
               <p className="text-xs text-muted-foreground">
-                Must be at least 6 characters
+                Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)
               </p>
             )}
           </div>

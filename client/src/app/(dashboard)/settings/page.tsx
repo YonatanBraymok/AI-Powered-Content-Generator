@@ -11,6 +11,7 @@ import {
   useDeleteAccount,
 } from "@/hooks/use-profile";
 import type { ApiError } from "@/lib/api";
+import { validateEmail, validatePassword } from "@/lib/validation";
 import {
   Button,
   Card,
@@ -43,6 +44,18 @@ function ProfileSection() {
     e.preventDefault();
     setFieldErrors({});
 
+    const errors: Record<string, string> = {};
+    if (!name.trim()) errors.name = "Name is required";
+    if (email !== user?.email) {
+      const emailErr = validateEmail(email);
+      if (emailErr) errors.email = emailErr;
+    }
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below.");
+      return;
+    }
+
     const payload: { name?: string; email?: string } = {};
     if (name !== user?.name) payload.name = name;
     if (email !== user?.email) payload.email = email;
@@ -73,7 +86,7 @@ function ProfileSection() {
         <CardTitle>Profile</CardTitle>
         <CardDescription>Update your name and email address.</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="profile-name">Name</Label>
@@ -147,8 +160,19 @@ function PasswordSection() {
     e.preventDefault();
     setFieldErrors({});
 
-    if (newPassword !== confirmPassword) {
-      setFieldErrors({ confirmPassword: "New passwords do not match." });
+    const errors: Record<string, string> = {};
+    if (!currentPassword) errors.currentPassword = "Current password is required";
+    const passwordErr = validatePassword(newPassword);
+    if (passwordErr) errors.newPassword = passwordErr;
+    if (!confirmPassword) {
+      errors.confirmPassword = "Please confirm your new password";
+    } else if (newPassword !== confirmPassword) {
+      errors.confirmPassword = "New passwords do not match.";
+    }
+
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below.");
       return;
     }
 
@@ -207,7 +231,7 @@ function PasswordSection() {
         </div>
       </CardHeader>
       {expanded && (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="current-password">Current password</Label>
@@ -219,7 +243,6 @@ function PasswordSection() {
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 disabled={changePassword.isPending}
-                required
               />
               {fieldErrors.currentPassword && (
                 <p className="text-sm text-destructive">{fieldErrors.currentPassword}</p>
@@ -235,11 +258,13 @@ function PasswordSection() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 disabled={changePassword.isPending}
-                required
-                minLength={6}
               />
-              {fieldErrors.newPassword && (
+              {fieldErrors.newPassword ? (
                 <p className="text-sm text-destructive">{fieldErrors.newPassword}</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)
+                </p>
               )}
             </div>
             <div className="space-y-2">
@@ -252,8 +277,6 @@ function PasswordSection() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={changePassword.isPending}
-                required
-                minLength={6}
               />
               {fieldErrors.confirmPassword && (
                 <p className="text-sm text-destructive">{fieldErrors.confirmPassword}</p>

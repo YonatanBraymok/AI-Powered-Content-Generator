@@ -7,6 +7,7 @@ import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
 import type { ApiError } from "@/lib/api";
+import { validatePassword } from "@/lib/validation";
 import {
   Button,
   Card,
@@ -69,25 +70,32 @@ function ResetPasswordContent() {
     e.preventDefault();
     setFieldErrors({});
 
-    if (password !== confirm) {
-      setFieldErrors({ confirm: "Passwords do not match" });
-      return;
+    const errors: Record<string, string> = {};
+    const passwordErr = validatePassword(password);
+    if (passwordErr) errors.password = passwordErr;
+    if (!confirm) {
+      errors.confirm = "Please confirm your password";
+    } else if (password !== confirm) {
+      errors.confirm = "Passwords do not match";
     }
 
-    if (password.length < 6) {
-      setFieldErrors({ password: "Password must be at least 6 characters" });
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below.");
       return;
     }
 
     setIsPending(true);
     try {
       await api.post("/api/auth/reset-password", { token, password });
+      toast.success("Password updated! Redirecting…");
       setDone(true);
       setTimeout(() => router.replace("/login"), 2500);
     } catch (err: unknown) {
       const apiErr = err as ApiError;
       if (apiErr.fieldErrors) {
         setFieldErrors(apiErr.fieldErrors);
+        toast.error("Please fix the errors below.");
       } else {
         toast.error(apiErr.message ?? "Failed to reset password");
       }
@@ -118,7 +126,7 @@ function ResetPasswordContent() {
         <CardTitle className="text-xl">Reset your password</CardTitle>
         <CardDescription>Enter and confirm your new password.</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="password">New password</Label>
@@ -126,14 +134,17 @@ function ResetPasswordContent() {
               id="password"
               type="password"
               placeholder="••••••••"
-              required
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isPending}
             />
-            {fieldErrors.password && (
+            {fieldErrors.password ? (
               <p className="text-sm text-destructive">{fieldErrors.password}</p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)
+              </p>
             )}
           </div>
           <div className="space-y-2">
@@ -142,7 +153,6 @@ function ResetPasswordContent() {
               id="confirm"
               type="password"
               placeholder="••••••••"
-              required
               autoComplete="new-password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}

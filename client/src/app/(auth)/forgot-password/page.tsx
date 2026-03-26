@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
 import type { ApiError } from "@/lib/api";
+import { validateEmail } from "@/lib/validation";
 import {
   Button,
   Card,
@@ -27,14 +28,24 @@ export default function ForgotPasswordPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setFieldErrors({});
+
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setFieldErrors({ email: emailErr });
+      toast.error(emailErr);
+      return;
+    }
+
     setIsPending(true);
     try {
       await api.post("/api/auth/forgot-password", { email });
       setSent(true);
+      toast.success("Reset link sent — check your inbox.");
     } catch (err: unknown) {
       const apiErr = err as ApiError;
       if (apiErr.fieldErrors) {
         setFieldErrors(apiErr.fieldErrors);
+        toast.error("Please fix the errors below.");
       } else {
         toast.error(apiErr.message ?? "Something went wrong");
       }
@@ -79,7 +90,7 @@ export default function ForgotPasswordPage() {
           Enter your email and we&apos;ll send you a reset link.
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -87,7 +98,6 @@ export default function ForgotPasswordPage() {
               id="email"
               type="email"
               placeholder="you@example.com"
-              required
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
