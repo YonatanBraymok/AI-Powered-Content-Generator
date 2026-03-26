@@ -48,9 +48,11 @@ function VerifyEmailContent() {
       try {
         await api.get(`/api/auth/verify-email?token=${token}`);
         await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        toast.success("Email verified! Redirecting to your dashboard…");
         setStatus("success");
         setTimeout(() => router.replace("/dashboard"), 2000);
       } catch {
+        toast.error("Verification failed — this link may be invalid or expired.");
         setStatus("error");
       }
     }

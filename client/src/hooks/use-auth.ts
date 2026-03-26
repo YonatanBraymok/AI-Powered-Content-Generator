@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import api from "@/lib/api";
 import type { AuthResponse, User } from "@/lib/types";
 
@@ -57,6 +58,9 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       await api.post("/api/auth/logout");
+    },
+    onSuccess: () => {
+      toast.success("You've been signed out.");
     },
     onSettled: () => {
       queryClient.clear();

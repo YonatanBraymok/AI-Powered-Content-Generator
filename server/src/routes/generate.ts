@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { authenticate, requireEmailVerified } from "../middleware/auth";
-import { generateContent } from "../services/openai";
+import { generateContent } from "../services/geminiai";
 import { createPost } from "../services/post";
 import logger from "../lib/logger";
 
