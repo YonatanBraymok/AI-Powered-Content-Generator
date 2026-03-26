@@ -245,4 +245,130 @@
   .auth-footerLink {
     @apply text-xs font-medium tracking-widest text-muted-foreground uppercase transition-colors hover:text-foreground;
   }
+
+  /* Dashboard utilities (Phase 1) */
+  .dash-shell {
+    @apply relative min-h-screen bg-background;
+    background: radial-gradient(
+        1200px 520px at 70% -10%,
+        color-mix(in oklch, var(--ring) 10%, transparent),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in oklch, var(--background) 92%, var(--muted) 8%),
+        var(--background)
+      );
+  }
+
+  .dash-blob {
+    @apply pointer-events-none absolute -z-10 rounded-full blur-3xl;
+    background: color-mix(in oklch, var(--primary) 8%, transparent);
+  }
+
+  .dash-blobTopRight {
+    @apply -top-28 -right-28 h-[22rem] w-[22rem] sm:h-[28rem] sm:w-[28rem];
+  }
+
+  .dash-blobBottomLeft {
+    @apply -bottom-36 -left-36 h-[26rem] w-[26rem] sm:h-[30rem] sm:w-[30rem];
+    background: color-mix(in oklch, var(--ring) 10%, transparent);
+  }
+
+  .dash-glassHeader {
+    @apply sticky top-0 z-50 border-b border-foreground/10 bg-background/70 backdrop-blur-xl;
+  }
+
+  .dash-brandMark {
+    @apply grid size-8 place-items-center rounded-lg text-primary-foreground shadow-sm ring-1 ring-foreground/10;
+    background: color-mix(in oklch, var(--primary) 88%, var(--ring) 12%);
+  }
+
+  .dash-navLink {
+    @apply font-heading text-sm font-semibold tracking-tight text-muted-foreground transition-colors hover:text-foreground;
+  }
+
+  .dash-navLinkActive {
+    @apply text-foreground;
+  }
+
+  .dash-iconButton {
+    @apply inline-flex size-10 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+
+  .dash-sectionHeader {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between;
+  }
+
+  .dash-sectionTitle {
+    @apply font-heading text-3xl font-extrabold tracking-tight text-foreground;
+  }
+
+  .dash-sectionDesc {
+    @apply text-sm text-muted-foreground;
+  }
+
+  .dash-sectionRight {
+    @apply flex items-center;
+  }
+
+  .dash-hero {
+    @apply relative overflow-hidden rounded-3xl border border-foreground/10 bg-card p-6 shadow-2xl shadow-foreground/5 sm:p-10;
+  }
+
+  .dash-heroAccent {
+    @apply pointer-events-none absolute inset-y-0 right-0 w-1/3;
+    background: linear-gradient(
+      270deg,
+      color-mix(in oklch, var(--ring) 10%, transparent),
+      transparent 70%
+    );
+  }
+
+  .dash-heroBlob {
+    @apply pointer-events-none absolute -top-24 -right-24 size-72 rounded-full blur-3xl;
+    background: color-mix(in oklch, var(--ring) 12%, transparent);
+  }
+
+  .dash-heroInner {
+    @apply relative;
+  }
+
+  .dash-heroHeader {
+    @apply mb-8 flex items-center gap-4;
+  }
+
+  .dash-heroIcon {
+    @apply grid size-12 place-items-center rounded-2xl shadow-lg ring-1 ring-foreground/10;
+    background: color-mix(in oklch, var(--primary) 88%, var(--ring) 12%);
+    box-shadow: 0 18px 30px -18px color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+
+  .dash-heroTitle {
+    @apply font-heading text-3xl font-extrabold tracking-tight text-foreground;
+  }
+
+  .dash-heroDesc {
+    @apply mt-1 text-sm text-muted-foreground;
+  }
+
+  .dash-microLabel {
+    @apply ml-1 text-[0.7rem] font-bold tracking-[0.16em] text-muted-foreground uppercase;
+  }
+
+  .dash-segmented {
+    @apply inline-flex rounded-xl bg-muted/60 p-1 ring-1 ring-foreground/10;
+  }
+
+  .dash-segmentedItem {
+    @apply rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+
+  .dash-segmentedItemActive {
+    @apply bg-background text-foreground shadow-sm;
+  }
+
+  .dash-enter {
+    @apply motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:ease-out motion-reduce:animate-none;
+  }
 }

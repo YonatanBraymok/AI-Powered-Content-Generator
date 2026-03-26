@@ -57,8 +57,10 @@ export default function ForgotPasswordPage() {
         <AuthCardHeader
           title="Check your email"
           description={
-            If an account exists for <strong>{email}</strong>, we&apos;ve sent a
-            password reset link. It expires in 1 hour.
+            <>
+              If an account exists for <strong>{email}</strong>, we&apos;ve sent a
+              password reset link. It expires in 1 hour.
+            </>
           }
         />
         <AuthCardContent className="flex justify-center py-4">

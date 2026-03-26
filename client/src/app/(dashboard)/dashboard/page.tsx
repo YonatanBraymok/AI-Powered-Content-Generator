@@ -1,26 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import { GenerateForm } from "@/components/generate-form";
 import { PostList } from "@/components/post-list";
-import { Separator } from "@/components/ui";
+import { StudioHero } from "@/components/dashboard/studio-hero";
+import { SectionHeader } from "@/components/dashboard/section-header";
+import { SegmentedControl } from "@/components/dashboard/segmented-control";
 
 export default function DashboardPage() {
+  const [tab, setTab] = useState<"drafts" | "published">("drafts");
+
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Generate and manage your AI-powered content.
-        </p>
-      </div>
+    <div className="space-y-14">
+      <StudioHero>
+        <GenerateForm />
+      </StudioHero>
 
-      <GenerateForm />
+      <section className="space-y-8">
+        <SectionHeader
+          title="Recent Works"
+          description="Review and manage your generated content drafts."
+          right={
+            <SegmentedControl
+              ariaLabel="Posts view"
+              value={tab}
+              onChange={setTab}
+              options={[
+                { value: "drafts", label: "All Drafts" },
+                { value: "published", label: "Published" },
+              ]}
+            />
+          }
+        />
 
-      <div className="space-y-4">
-        <Separator />
-        <h2 className="text-lg font-semibold">Your Posts</h2>
         <PostList />
-      </div>
+      </section>
     </div>
   );
 }
