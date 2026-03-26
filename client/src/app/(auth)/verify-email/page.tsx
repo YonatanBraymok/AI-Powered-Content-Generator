@@ -6,29 +6,24 @@ import { CheckCircle2, Loader2, MailOpen, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { Button } from "@/components/ui";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui";
+  AuthCard,
+  AuthCardContent,
+  AuthCardFooter,
+  AuthCardHeader,
+} from "@/components/auth/auth-card";
 
 type Status = "verifying" | "success" | "error" | "pending";
 
 function VerifyEmailFallback() {
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Loading…</CardTitle>
-        <CardDescription>Preparing verification.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex justify-center py-6">
+    <AuthCard>
+      <AuthCardHeader title="Loading…" description="Preparing verification." />
+      <AuthCardContent className="flex justify-center py-6">
         <Loader2 className="size-10 animate-spin text-muted-foreground" />
-      </CardContent>
-    </Card>
+      </AuthCardContent>
+    </AuthCard>
   );
 }
 
@@ -76,47 +71,39 @@ function VerifyEmailContent() {
 
   if (status === "verifying") {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Verifying your email…</CardTitle>
-          <CardDescription>Please wait a moment.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
+      <AuthCard>
+        <AuthCardHeader title="Verifying your email…" description="Please wait a moment." />
+        <AuthCardContent className="flex justify-center py-6">
           <Loader2 className="size-10 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
+        </AuthCardContent>
+      </AuthCard>
     );
   }
 
   if (status === "success") {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Email verified!</CardTitle>
-          <CardDescription>Redirecting you to the dashboard…</CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
+      <AuthCard>
+        <AuthCardHeader title="Email verified!" description="Redirecting you to the dashboard…" />
+        <AuthCardContent className="flex justify-center py-6">
           <CheckCircle2 className="size-10 text-green-500" />
-        </CardContent>
-      </Card>
+        </AuthCardContent>
+      </AuthCard>
     );
   }
 
   if (status === "error") {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Verification failed</CardTitle>
-          <CardDescription>
-            This link is invalid or has expired. Request a new one below.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
+      <AuthCard>
+        <AuthCardHeader
+          title="Verification failed"
+          description="This link is invalid or has expired. Request a new one below."
+        />
+        <AuthCardContent className="flex justify-center py-6">
           <XCircle className="size-10 text-destructive" />
-        </CardContent>
-        <CardFooter>
+        </AuthCardContent>
+        <AuthCardContent className="pt-0">
           <Button
-            className="w-full"
+            className="auth-primaryButton w-full"
             onClick={handleResend}
             disabled={isResending}
           >
@@ -129,27 +116,24 @@ function VerifyEmailContent() {
               "Resend verification email"
             )}
           </Button>
-        </CardFooter>
-      </Card>
+        </AuthCardContent>
+      </AuthCard>
     );
   }
 
   // status === "pending" — user has no token, redirected from AuthGuard
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Check your inbox</CardTitle>
-        <CardDescription>
-          We sent a verification link to your email address. Click the link to
-          activate your account.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex justify-center py-6">
+    <AuthCard>
+      <AuthCardHeader
+        title="Check your inbox"
+        description="We sent a verification link to your email address. Click the link to activate your account."
+      />
+      <AuthCardContent className="flex justify-center py-6">
         <MailOpen className="size-10 text-muted-foreground" />
-      </CardContent>
-      <CardFooter className="flex flex-col gap-3">
+      </AuthCardContent>
+      <AuthCardContent className="pt-0">
         <Button
-          className="w-full"
+          className="auth-primaryButton w-full"
           onClick={handleResend}
           disabled={isResending}
         >
@@ -162,18 +146,20 @@ function VerifyEmailContent() {
             "Resend verification email"
           )}
         </Button>
+      </AuthCardContent>
+      <AuthCardFooter className="gap-3">
         <p className="text-center text-sm text-muted-foreground">
           Wrong account?{" "}
           <button
             type="button"
             onClick={() => router.replace("/login")}
-            className="font-medium text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-foreground underline-offset-4 hover:underline"
           >
             Sign out
           </button>
         </p>
-      </CardFooter>
-    </Card>
+      </AuthCardFooter>
+    </AuthCard>
   );
 }
 

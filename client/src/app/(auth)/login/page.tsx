@@ -3,22 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useLogin } from "@/hooks/use-auth";
 import type { ApiError } from "@/lib/api";
 import { validateEmail } from "@/lib/validation";
+import { Button } from "@/components/ui";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from "@/components/ui";
+  AuthCard,
+  AuthCardContent,
+  AuthCardFooter,
+  AuthCardHeader,
+} from "@/components/auth/auth-card";
+import { AuthDivider } from "@/components/auth/auth-divider";
+import { AuthField } from "@/components/auth/auth-field";
+import { AuthSocial } from "@/components/auth/auth-social";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -62,56 +61,49 @@ export default function LoginPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to your account to continue</CardDescription>
-      </CardHeader>
+    <AuthCard>
+      <AuthCardHeader
+        title="Welcome back"
+        description="Enter your credentials to access your creator studio."
+      />
       <form onSubmit={handleSubmit} noValidate>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={login.isPending}
-            />
-            {fieldErrors.email && (
-              <p className="text-sm text-destructive">{fieldErrors.email}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-muted-foreground underline-offset-4 hover:underline"
-              >
+        <AuthCardContent className="space-y-5">
+          <AuthField
+            id="email"
+            label="Email address"
+            type="email"
+            placeholder="name@company.com"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={login.isPending}
+            icon={<Mail className="size-4" />}
+            error={fieldErrors.email}
+          />
+
+          <AuthField
+            id="password"
+            label="Password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={login.isPending}
+            icon={<Lock className="size-4" />}
+            rightAccessory={
+              <Link href="/forgot-password" className="hover:underline underline-offset-4">
                 Forgot password?
               </Link>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={login.isPending}
-            />
-            {fieldErrors.password && (
-              <p className="text-sm text-destructive">{fieldErrors.password}</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
+            }
+            error={fieldErrors.password}
+          />
+        </AuthCardContent>
+
+        <AuthCardContent className="pt-0">
           <Button
             type="submit"
-            className="w-full"
+            className="auth-primaryButton w-full"
             disabled={login.isPending}
           >
             {login.isPending ? (
@@ -123,17 +115,23 @@ export default function LoginPage() {
               "Sign in"
             )}
           </Button>
+
+          <AuthDivider />
+          <AuthSocial />
+        </AuthCardContent>
+
+        <AuthCardFooter>
           <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
               Create one
             </Link>
           </p>
-        </CardFooter>
+        </AuthCardFooter>
       </form>
-    </Card>
+    </AuthCard>
   );
 }
