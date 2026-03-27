@@ -8,19 +8,9 @@ import { authenticate } from "../middleware/auth";
 import { passwordResetLimiter } from "../middleware/rate-limit";
 import logger from "../lib/logger";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../lib/email";
+import { IS_PROD, zodFieldErrors } from "../lib/utils";
 
 const router = Router();
-
-function zodFieldErrors(error: z.ZodError): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (const issue of error.issues) {
-    const field = issue.path[0];
-    if (field !== undefined && !result[String(field)]) {
-      result[String(field)] = issue.message;
-    }
-  }
-  return result;
-}
 
 const strongPassword = z
   .string()
@@ -52,7 +42,6 @@ const resetPasswordSchema = z.object({
 
 const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
-const IS_PROD = process.env.NODE_ENV === "production";
 
 function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
@@ -79,7 +68,7 @@ function setAuthCookies(
   });
 }
 
-function clearAuthCookies(res: Response) {
+export function clearAuthCookies(res: Response) {
   res.clearCookie("access_token", {
     httpOnly: true,
     secure: IS_PROD,
