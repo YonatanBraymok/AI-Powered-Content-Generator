@@ -33,7 +33,7 @@ export default function DashboardPage() {
           }
         />
 
-        <PostList />
+        <PostList filter={tab} />
       </section>
     </div>
   );

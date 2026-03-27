@@ -8,7 +8,11 @@ import { PostCard } from "@/components/post-card";
 import { EmptyState } from "@/components/empty-state";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 
-export function PostList() {
+interface PostListProps {
+  filter?: "drafts" | "published";
+}
+
+export function PostList({ filter }: PostListProps) {
   const { data: posts, isLoading, isError, refetch } = usePosts();
 
   useEffect(() => {
@@ -33,19 +37,37 @@ export function PostList() {
     );
   }
 
-  if (!posts || posts.length === 0) {
+  const filtered =
+    filter === "published"
+      ? (posts ?? []).filter((p) => p.isPublished)
+      : (posts ?? []).filter((p) => !p.isPublished);
+
+  if (filtered.length === 0) {
+    const isEmpty = !posts || posts.length === 0;
     return (
       <EmptyState
         icon={FileText}
-        title="No posts yet"
-        description="Generate your first AI-powered post using the form above."
+        title={
+          isEmpty
+            ? "No posts yet"
+            : filter === "published"
+              ? "No published posts yet"
+              : "No drafts yet"
+        }
+        description={
+          isEmpty
+            ? "Generate your first AI-powered post using the form above."
+            : filter === "published"
+              ? "Publish a draft to see it here."
+              : "All your posts have been published."
+        }
       />
     );
   }
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {posts.map((post) => (
+      {filtered.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
     </div>
