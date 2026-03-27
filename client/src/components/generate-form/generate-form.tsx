@@ -23,6 +23,7 @@ import {
 
 export function GenerateForm() {
   const [topic, setTopic] = useState("");
+  const [title, setTitle] = useState("");
   const [style, setStyle] = useState<string>(CONTENT_STYLES[0]);
   const generate = useGenerateContent();
 
@@ -33,10 +34,11 @@ export function GenerateForm() {
     if (!trimmed) return;
 
     generate.mutate(
-      { topic: trimmed, style },
+      { topic: trimmed, style, title: title.trim() || undefined },
       {
         onSuccess: () => {
           setTopic("");
+          setTitle("");
           toast.success("Content generated successfully!");
         },
         onError: (error: Error) => {
@@ -59,6 +61,20 @@ export function GenerateForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-5">
+          <div>
+            <Label htmlFor="title" className="dash-microLabel">
+              Title{" "}
+              <span className="font-normal text-muted-foreground">(optional)</span>
+            </Label>
+            <Input
+              id="title"
+              className="mt-2 h-14 rounded-xl bg-background/30 px-5 text-base font-medium placeholder:text-muted-foreground/70 focus-visible:ring-ring/40"
+              placeholder="Give your post a title, or let the AI decide"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={generate.isPending}
+            />
+          </div>
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-7">
               <Label htmlFor="topic" className="dash-microLabel">
