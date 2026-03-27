@@ -176,7 +176,7 @@ function ResetPasswordContent() {
               href="/login"
               className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
-              Sign in
+              Sign In
             </Link>
           </p>
         </AuthCardFooter>

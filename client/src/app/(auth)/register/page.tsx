@@ -65,8 +65,8 @@ export default function RegisterPage() {
   return (
     <AuthCard>
       <AuthCardHeader
-        title="Create an account"
-        description="Get started with AI-powered content generation."
+        title="Create Account"
+        description="Create your PromptPost account to get started."
       />
       <form onSubmit={handleSubmit} noValidate>
         <AuthCardContent className="space-y-5">
@@ -125,19 +125,19 @@ export default function RegisterPage() {
                 Creating account…
               </>
             ) : (
-              "Create account"
+              "Create Account"
             )}
           </Button>
         </AuthCardContent>
 
         <AuthCardFooter>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground/90">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold text-foreground underline-offset-4 hover:underline"
+              className="font-semibold text-primary underline-offset-4 hover:underline"
             >
-              Sign in
+              Sign In
             </Link>
           </p>
         </AuthCardFooter>

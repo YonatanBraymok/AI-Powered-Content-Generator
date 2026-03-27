@@ -1,39 +1,43 @@
 "use client";
 
-import { useState } from "react";
 import { GenerateForm } from "@/components/generate-form";
 import { PostList } from "@/components/post-list";
 import { StudioHero } from "@/components/dashboard/studio-hero";
 import { SectionHeader } from "@/components/dashboard/section-header";
-import { SegmentedControl } from "@/components/dashboard/segmented-control";
 
 export default function DashboardPage() {
-  const [tab, setTab] = useState<"drafts" | "published">("drafts");
-
   return (
-    <div className="space-y-14">
-      <StudioHero>
-        <GenerateForm />
-      </StudioHero>
+    <div className="dash-enter space-y-10 lg:space-y-12">
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start lg:gap-7">
+        <div className="lg:col-span-8">
+          <StudioHero
+            title="Command Center"
+            description="Orchestrate your creative outputs with precision."
+          >
+            <GenerateForm />
+          </StudioHero>
+        </div>
 
-      <section className="space-y-8">
-        <SectionHeader
-          title="Recent Works"
-          description="Review and manage your generated content drafts."
-          right={
-            <SegmentedControl
-              ariaLabel="Posts view"
-              value={tab}
-              onChange={setTab}
-              options={[
-                { value: "drafts", label: "All Drafts" },
-                { value: "published", label: "Published" },
-              ]}
+        <aside className="lg:col-span-4">
+          <div className="dash-draftsPanel">
+            <SectionHeader
+              className="dash-draftsPanelHeader"
+              title="Drafts"
+              description="Unpublished content ready for review."
             />
-          }
-        />
+            <div className="dash-draftsPanelBody">
+              <PostList filter="drafts" compact />
+            </div>
+          </div>
+        </aside>
+      </section>
 
-        <PostList filter={tab} />
+      <section className="space-y-6">
+        <SectionHeader
+          title="Published Posts"
+          description="Live content available to your audience."
+        />
+        <PostList filter="published" />
       </section>
     </div>
   );

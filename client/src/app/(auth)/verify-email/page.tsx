@@ -148,14 +148,14 @@ function VerifyEmailContent() {
         </Button>
       </AuthCardContent>
       <AuthCardFooter className="gap-3">
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm text-muted-foreground/90">
           Wrong account?{" "}
           <button
             type="button"
             onClick={() => router.replace("/login")}
-            className="font-semibold text-foreground underline-offset-4 hover:underline"
+            className="font-semibold text-primary underline-offset-4 hover:underline"
           >
-            Sign out
+            Sign In
           </button>
         </p>
       </AuthCardFooter>

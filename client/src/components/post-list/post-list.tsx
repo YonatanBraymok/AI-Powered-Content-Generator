@@ -10,9 +10,10 @@ import { LoadingSkeleton } from "@/components/loading-skeleton";
 
 interface PostListProps {
   filter?: "drafts" | "published";
+  compact?: boolean;
 }
 
-export function PostList({ filter }: PostListProps) {
+export function PostList({ filter, compact = false }: PostListProps) {
   const { data: posts, isLoading, isError, refetch } = usePosts();
 
   useEffect(() => {
@@ -22,7 +23,7 @@ export function PostList({ filter }: PostListProps) {
   }, [isError]);
 
   if (isLoading) {
-    return <LoadingSkeleton count={6} />;
+    return <LoadingSkeleton count={compact ? 3 : 6} compact={compact} />;
   }
 
   if (isError) {
@@ -66,7 +67,7 @@ export function PostList({ filter }: PostListProps) {
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={compact ? "grid gap-5 grid-cols-1" : "grid gap-6 sm:grid-cols-2 lg:grid-cols-3"}>
       {filtered.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}

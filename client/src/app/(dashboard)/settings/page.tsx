@@ -82,7 +82,7 @@ function ProfileSection() {
   }
 
   return (
-    <Card className="border-foreground/10 bg-card/80 shadow-2xl shadow-foreground/5">
+    <Card className="border-white/18 bg-card/80 shadow-[0_2px_4px_rgba(0,_0,_0,_0.14),0_20px_42px_rgba(0,_0,_0,_0.2)] backdrop-blur-xl">
       <CardHeader>
         <CardTitle>Profile</CardTitle>
         <CardDescription>Update your name and email address.</CardDescription>
@@ -200,7 +200,7 @@ function PasswordSection() {
   }
 
   return (
-    <Card className="border-foreground/10 bg-card/80 shadow-2xl shadow-foreground/5">
+    <Card className="border-white/18 bg-card/80 shadow-[0_2px_4px_rgba(0,_0,_0,_0.14),0_20px_42px_rgba(0,_0,_0,_0.2)] backdrop-blur-xl">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -316,7 +316,7 @@ function DangerZoneSection() {
   }
 
   return (
-    <Card className="border-destructive/40 bg-card/80 shadow-2xl shadow-foreground/5">
+    <Card className="border-white/18 bg-card/80 shadow-[0_2px_4px_rgba(0,_0,_0,_0.14),0_20px_42px_rgba(0,_0,_0,_0.2)] backdrop-blur-xl">
       <CardHeader>
         <div className="flex items-center gap-2">
           <ShieldAlert className="size-4 text-destructive" />

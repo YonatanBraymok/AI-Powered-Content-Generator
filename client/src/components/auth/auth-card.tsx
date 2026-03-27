@@ -17,7 +17,16 @@ export function AuthCard({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <Card className={cn("auth-card", className)}>{children}</Card>;
+  return (
+    <Card className={cn("auth-card", className)}>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[inherit] border border-white/10" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-24 rounded-t-[inherit] bg-gradient-to-b from-white/8 to-transparent"
+      />
+      <div className="relative z-10">{children}</div>
+    </Card>
+  );
 }
 
 export function AuthCardHeader({

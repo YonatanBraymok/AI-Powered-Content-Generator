@@ -35,7 +35,7 @@ export function PostCard({ post }: PostCardProps) {
     <Card
       role="link"
       tabIndex={0}
-      className="group cursor-pointer overflow-hidden rounded-3xl border-foreground/10 bg-card/80 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-foreground/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transform-none"
+      className="group cursor-pointer overflow-hidden rounded-[1.75rem] border-white/18 bg-card/78 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_3px_8px_rgba(0,_0,_0,_0.14),0_20px_38px_rgba(0,_0,_0,_0.2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transform-none"
       onClick={navigate}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -64,7 +64,7 @@ export function PostCard({ post }: PostCardProps) {
         <p className="line-clamp-3 text-[14px] leading-relaxed text-muted-foreground">
           {post.content}
         </p>
-        <div className="flex items-center justify-between border-t border-foreground/10 pt-5">
+        <div className="flex items-center justify-between border-t border-white/15 pt-5">
           <Badge
             variant={post.isPublished ? "default" : "outline"}
             className="gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold tracking-widest uppercase"
@@ -81,7 +81,7 @@ export function PostCard({ post }: PostCardProps) {
               </>
             )}
           </Badge>
-          <span className="inline-flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+          <span className="inline-flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors duration-300 group-hover:bg-secondary/25 group-hover:text-foreground">
             <Calendar className="size-4" />
           </span>
         </div>

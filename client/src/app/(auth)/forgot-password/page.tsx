@@ -84,8 +84,8 @@ export default function ForgotPasswordPage() {
   return (
     <AuthCard>
       <AuthCardHeader
-        title="Forgot your password?"
-        description="Enter your email and we’ll send you a reset link."
+        title="Forgot Password"
+        description="Enter your email address and we&apos;ll send you a reset link."
       />
       <form onSubmit={handleSubmit} noValidate>
         <AuthCardContent className="space-y-5">
@@ -127,7 +127,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
-              Sign in
+              Sign In
             </Link>
           </p>
         </AuthCardFooter>

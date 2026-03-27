@@ -12,7 +12,7 @@ export default function DashboardLayout({
       <DashboardShell>
         <div className="flex min-h-screen flex-col">
           <AppHeader />
-          <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
+          <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
             <div className="dash-enter">{children}</div>
           </main>
         </div>

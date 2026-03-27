@@ -80,7 +80,8 @@ export default function PublisherPostsPage() {
   if (data.posts.length === 0) {
     return (
       <PublisherPostsShell>
-        <div className="space-y-6">
+        <div className="postview-article space-y-6 p-8 sm:p-10">
+          <div aria-hidden="true" className="postview-grain" />
           <header className="space-y-3">
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
               {data.user.name}&apos;s Published Posts
@@ -107,9 +108,10 @@ export default function PublisherPostsPage() {
 
   return (
     <PublisherPostsShell>
-      <div className="space-y-6">
+      <div className="mx-auto max-w-5xl space-y-8">
         <header className="space-y-3">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <p className="postview-titleLabel">Publisher</p>
+          <h1 className="text-3xl font-heading font-extrabold tracking-tight sm:text-4xl">
             {data.user.name}&apos;s Published Posts
           </h1>
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -121,12 +123,14 @@ export default function PublisherPostsPage() {
 
         <Separator />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {data.posts.map((post) => (
             <Link key={post.id} href={`/posts/${post.shareId}`} className="group">
-              <Card className="h-full transition-shadow group-hover:shadow-md">
+              <Card className="h-full rounded-[1.75rem] border-white/18 bg-card/78 backdrop-blur-xl transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-[0_3px_8px_rgba(0,_0,_0,_0.14),0_20px_38px_rgba(0,_0,_0,_0.2)]">
                 <CardHeader>
-                  <CardTitle className="line-clamp-2">{post.title}</CardTitle>
+                  <CardTitle className="line-clamp-2 font-heading text-xl tracking-tight">
+                    {post.title}
+                  </CardTitle>
                   <CardDescription className="line-clamp-1">
                     {post.topic}
                   </CardDescription>
@@ -136,7 +140,9 @@ export default function PublisherPostsPage() {
                     {post.content}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="secondary">{post.style}</Badge>
+                    <Badge variant="secondary" className="font-bold tracking-wide">
+                      {post.style}
+                    </Badge>
                     <span className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
                       <Calendar className="size-3" />
                       {formatDate(post.createdAt)}
@@ -154,9 +160,9 @@ export default function PublisherPostsPage() {
 
 function PublisherPostsShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
+    <div className="postview-shell flex min-h-screen flex-col">
+      <header className="postview-header">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             href="/"
             className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
@@ -170,11 +176,11 @@ function PublisherPostsShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
+      <main className="postview-main">
         {children}
       </main>
 
-      <footer className="border-t py-6 text-center text-sm text-muted-foreground">
+      <footer className="postview-footer">
         Powered by{" "}
         <Link
           href="/register"

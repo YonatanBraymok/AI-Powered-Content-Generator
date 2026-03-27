@@ -49,7 +49,7 @@ export function GenerateForm() {
   }
 
   return (
-    <Card className="border-foreground/10 bg-background/50 shadow-2xl shadow-foreground/5">
+    <Card className="border-white/18 bg-background/54 shadow-[0_2px_4px_rgba(0,_0,_0,_0.14),0_20px_42px_rgba(0,_0,_0,_0.2)] backdrop-blur-xl">
       <CardHeader className="pb-6">
         <CardTitle className="flex items-center gap-2 font-heading text-lg font-bold tracking-tight">
           <Sparkles className="size-5 text-primary" />
@@ -113,7 +113,7 @@ export function GenerateForm() {
             <div className="lg:col-span-2">
               <Button
                 type="submit"
-                className="h-14 w-full rounded-xl font-heading font-bold shadow-lg shadow-primary/20 transition-transform active:translate-y-px"
+                className="h-14 w-full rounded-2xl font-heading font-bold shadow-[0_2px_4px_rgba(0,_0,_0,_0.16),0_16px_30px_rgba(0,_0,_0,_0.2)] transition-all duration-300 hover:brightness-105 active:translate-y-px"
                 disabled={generate.isPending || !topic.trim()}
               >
               {generate.isPending ? (

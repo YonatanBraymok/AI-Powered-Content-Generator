@@ -63,8 +63,8 @@ export default function LoginPage() {
   return (
     <AuthCard>
       <AuthCardHeader
-        title="Welcome back"
-        description="Enter your credentials to access your creator studio."
+        title="Sign In"
+        description="Enter your email and password to continue."
       />
       <form onSubmit={handleSubmit} noValidate>
         <AuthCardContent className="space-y-5">
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 Signing in…
               </>
             ) : (
-              "Sign in"
+              "Sign In"
             )}
           </Button>
 
@@ -121,13 +121,13 @@ export default function LoginPage() {
         </AuthCardContent>
 
         <AuthCardFooter>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground/90">
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="font-semibold text-foreground underline-offset-4 hover:underline"
+              className="font-semibold text-primary underline-offset-4 hover:underline"
             >
-              Create one
+              Create an account
             </Link>
           </p>
         </AuthCardFooter>

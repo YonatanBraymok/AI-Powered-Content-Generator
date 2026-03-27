@@ -38,13 +38,13 @@ export function AuthField({
   const describedById = error ? `${id}-error` : helper ? `${id}-help` : undefined;
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
+    <div className="space-y-2.5">
+      <div className="flex items-end justify-between gap-3">
         <Label htmlFor={id} className="auth-microLabel">
           {label}
         </Label>
         {rightAccessory ? (
-          <div className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
+          <div className="shrink-0 text-right text-xs leading-none font-semibold text-muted-foreground/90 transition-colors hover:text-foreground">
             {rightAccessory}
           </div>
         ) : null}
@@ -61,7 +61,7 @@ export function AuthField({
           disabled={disabled}
           aria-invalid={Boolean(error) || undefined}
           aria-describedby={describedById}
-          className={cn("auth-input pr-11", inputProps?.className)}
+          className={cn("auth-input", inputProps?.className)}
           {...inputProps}
         />
         {icon ? <div className="auth-inputIcon">{icon}</div> : null}
@@ -72,7 +72,7 @@ export function AuthField({
           {error}
         </p>
       ) : helper ? (
-        <p id={`${id}-help`} className="text-xs text-muted-foreground">
+        <p id={`${id}-help`} className="text-xs leading-snug text-muted-foreground">
           {helper}
         </p>
       ) : null}

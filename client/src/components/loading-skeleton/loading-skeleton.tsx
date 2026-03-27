@@ -2,11 +2,12 @@ import { Skeleton } from "@/components/ui";
 
 interface LoadingSkeletonProps {
   count?: number;
+  compact?: boolean;
 }
 
-export function LoadingSkeleton({ count = 3 }: LoadingSkeletonProps) {
+export function LoadingSkeleton({ count = 3, compact = false }: LoadingSkeletonProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={compact ? "grid gap-4 grid-cols-1" : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"}>
       {Array.from({ length: count }, (_, i) => (
         <div
           key={i}

@@ -1,4 +1,4 @@
-export const APP_NAME = "AI Content Generator";
+export const APP_NAME = "PromptPost";
 
 export const TOKEN_KEY = "auth_token";
 
