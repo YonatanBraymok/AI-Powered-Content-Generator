@@ -1,4 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
+
+const geminiResponseSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+});
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -34,5 +40,12 @@ export async function generateContent(input: GenerateRequest): Promise<{
   const raw = response.text;
   if (!raw) throw new Error("Empty response from Gemini");
 
-  return JSON.parse(raw) as { title: string; content: string };
+  const parsed = JSON.parse(raw);
+  const validated = geminiResponseSchema.safeParse(parsed);
+
+  if (!validated.success) {
+    throw new Error("Gemini returned an unexpected response shape");
+  }
+
+  return validated.data;
 }

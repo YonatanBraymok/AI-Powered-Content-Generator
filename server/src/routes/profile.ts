@@ -6,20 +6,10 @@ import prisma from "../lib/prisma";
 import { authenticate } from "../middleware/auth";
 import { sendVerificationEmail } from "../lib/email";
 import logger from "../lib/logger";
+import { zodFieldErrors } from "../lib/utils";
+import { clearAuthCookies } from "./auth";
 
 const router = Router();
-const IS_PROD = process.env.NODE_ENV === "production";
-
-function zodFieldErrors(error: z.ZodError): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (const issue of error.issues) {
-    const field = issue.path[0];
-    if (field !== undefined && !result[String(field)]) {
-      result[String(field)] = issue.message;
-    }
-  }
-  return result;
-}
 
 const updateProfileSchema = z.object({
   name: z.string().min(1, "Name is required").optional(),
@@ -156,17 +146,7 @@ router.delete("/", async (req: Request, res: Response) => {
 
     await prisma.user.delete({ where: { id: userId } });
 
-    res.clearCookie("access_token", {
-      httpOnly: true,
-      secure: IS_PROD,
-      sameSite: IS_PROD ? "none" : "lax",
-    });
-    res.clearCookie("refresh_token", {
-      httpOnly: true,
-      secure: IS_PROD,
-      sameSite: IS_PROD ? "none" : "lax",
-      path: "/api/auth",
-    });
+    clearAuthCookies(res);
 
     logger.info({ userId }, "Account deleted");
     res.json({ ok: true });

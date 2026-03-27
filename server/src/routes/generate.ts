@@ -4,6 +4,7 @@ import { authenticate, requireEmailVerified } from "../middleware/auth";
 import { generateContent } from "../services/geminiai";
 import { createPost } from "../services/post";
 import logger from "../lib/logger";
+import { zodFieldErrors } from "../lib/utils";
 
 const router = Router();
 
@@ -20,14 +21,7 @@ router.post("/", async (req: Request, res: Response) => {
   try {
     const result = generateSchema.safeParse(req.body);
     if (!result.success) {
-      const errors: Record<string, string> = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0];
-        if (field !== undefined && !errors[String(field)]) {
-          errors[String(field)] = issue.message;
-        }
-      }
-      res.status(400).json({ errors });
+      res.status(400).json({ errors: zodFieldErrors(result.error) });
       return;
     }
 
