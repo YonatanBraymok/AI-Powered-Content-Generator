@@ -3,34 +3,28 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { CheckCircle2, Loader2, XCircle, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
 import type { ApiError } from "@/lib/api";
 import { validatePassword } from "@/lib/validation";
+import { Button } from "@/components/ui";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from "@/components/ui";
+  AuthCard,
+  AuthCardContent,
+  AuthCardFooter,
+  AuthCardHeader,
+} from "@/components/auth/auth-card";
+import { AuthField } from "@/components/auth/auth-field";
 
 function ResetPasswordFallback() {
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Loading…</CardTitle>
-        <CardDescription>Preparing password reset.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex justify-center py-6">
+    <AuthCard>
+      <AuthCardHeader title="Loading…" description="Preparing password reset." />
+      <AuthCardContent className="flex justify-center py-6">
         <Loader2 className="size-10 animate-spin text-muted-foreground" />
-      </CardContent>
-    </Card>
+      </AuthCardContent>
+    </AuthCard>
   );
 }
 
@@ -47,22 +41,23 @@ function ResetPasswordContent() {
 
   if (!token) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Invalid link</CardTitle>
-          <CardDescription>
-            This password reset link is missing a token. Request a new one.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
+      <AuthCard>
+        <AuthCardHeader
+          title="Invalid link"
+          description="This password reset link is missing a token. Request a new one."
+        />
+        <AuthCardContent className="flex justify-center py-6">
           <XCircle className="size-10 text-destructive" />
-        </CardContent>
-        <CardFooter>
-          <Button className="w-full" onClick={() => router.push("/forgot-password")}>
+        </AuthCardContent>
+        <AuthCardContent className="pt-0">
+          <Button
+            className="auth-primaryButton w-full"
+            onClick={() => router.push("/forgot-password")}
+          >
             Request new link
           </Button>
-        </CardFooter>
-      </Card>
+        </AuthCardContent>
+      </AuthCard>
     );
   }
 
@@ -106,65 +101,63 @@ function ResetPasswordContent() {
 
   if (done) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Password updated!</CardTitle>
-          <CardDescription>
-            Your password has been reset. Redirecting you to sign in…
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
+      <AuthCard>
+        <AuthCardHeader
+          title="Password updated!"
+          description="Your password has been reset. Redirecting you to sign in…"
+        />
+        <AuthCardContent className="flex justify-center py-6">
           <CheckCircle2 className="size-10 text-green-500" />
-        </CardContent>
-      </Card>
+        </AuthCardContent>
+      </AuthCard>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Reset your password</CardTitle>
-        <CardDescription>Enter and confirm your new password.</CardDescription>
-      </CardHeader>
+    <AuthCard>
+      <AuthCardHeader
+        title="Reset your password"
+        description="Enter and confirm your new password."
+      />
       <form onSubmit={handleSubmit} noValidate>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="password">New password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isPending}
-            />
-            {fieldErrors.password ? (
-              <p className="text-sm text-destructive">{fieldErrors.password}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)
-              </p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm">Confirm new password</Label>
-            <Input
-              id="confirm"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              disabled={isPending}
-            />
-            {fieldErrors.confirm && (
-              <p className="text-sm text-destructive">{fieldErrors.confirm}</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full" disabled={isPending}>
+        <AuthCardContent className="space-y-5">
+          <AuthField
+            id="password"
+            label="New password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isPending}
+            icon={<Lock className="size-4" />}
+            error={fieldErrors.password}
+            helper={
+              fieldErrors.password
+                ? undefined
+                : "Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)"
+            }
+          />
+          <AuthField
+            id="confirm"
+            label="Confirm new password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            disabled={isPending}
+            icon={<ShieldCheck className="size-4" />}
+            error={fieldErrors.confirm}
+          />
+        </AuthCardContent>
+
+        <AuthCardContent className="pt-0">
+          <Button
+            type="submit"
+            className="auth-primaryButton w-full"
+            disabled={isPending}
+          >
             {isPending ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
@@ -174,18 +167,21 @@ function ResetPasswordContent() {
               "Update password"
             )}
           </Button>
+        </AuthCardContent>
+
+        <AuthCardFooter>
           <p className="text-center text-sm text-muted-foreground">
             Remember your password?{" "}
             <Link
               href="/login"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
               Sign in
             </Link>
           </p>
-        </CardFooter>
+        </AuthCardFooter>
       </form>
-    </Card>
+    </AuthCard>
   );
 }
 

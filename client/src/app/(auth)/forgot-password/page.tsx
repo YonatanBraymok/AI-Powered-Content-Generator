@@ -2,22 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
 import type { ApiError } from "@/lib/api";
 import { validateEmail } from "@/lib/validation";
+import { Button } from "@/components/ui";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from "@/components/ui";
+  AuthCard,
+  AuthCardContent,
+  AuthCardFooter,
+  AuthCardHeader,
+} from "@/components/auth/auth-card";
+import { AuthField } from "@/components/auth/auth-field";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -56,60 +53,62 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Check your email</CardTitle>
-          <CardDescription>
-            If an account exists for <strong>{email}</strong>, we&apos;ve sent a
-            password reset link. It expires in 1 hour.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-6">
+      <AuthCard>
+        <AuthCardHeader
+          title="Check your email"
+          description={
+            <>
+              If an account exists for <strong>{email}</strong>, we&apos;ve sent a
+              password reset link. It expires in 1 hour.
+            </>
+          }
+        />
+        <AuthCardContent className="flex justify-center py-4">
           <CheckCircle2 className="size-10 text-green-500" />
-        </CardContent>
-        <CardFooter>
+        </AuthCardContent>
+        <AuthCardFooter>
           <p className="w-full text-center text-sm text-muted-foreground">
             Back to{" "}
             <Link
               href="/login"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
               Sign in
             </Link>
           </p>
-        </CardFooter>
-      </Card>
+        </AuthCardFooter>
+      </AuthCard>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Forgot your password?</CardTitle>
-        <CardDescription>
-          Enter your email and we&apos;ll send you a reset link.
-        </CardDescription>
-      </CardHeader>
+    <AuthCard>
+      <AuthCardHeader
+        title="Forgot your password?"
+        description="Enter your email and we’ll send you a reset link."
+      />
       <form onSubmit={handleSubmit} noValidate>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isPending}
-            />
-            {fieldErrors.email && (
-              <p className="text-sm text-destructive">{fieldErrors.email}</p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full" disabled={isPending}>
+        <AuthCardContent className="space-y-5">
+          <AuthField
+            id="email"
+            label="Email address"
+            type="email"
+            placeholder="name@company.com"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isPending}
+            icon={<Mail className="size-4" />}
+            error={fieldErrors.email}
+          />
+        </AuthCardContent>
+
+        <AuthCardContent className="pt-0">
+          <Button
+            type="submit"
+            className="auth-primaryButton w-full"
+            disabled={isPending}
+          >
             {isPending ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
@@ -119,17 +118,20 @@ export default function ForgotPasswordPage() {
               "Send reset link"
             )}
           </Button>
+        </AuthCardContent>
+
+        <AuthCardFooter>
           <p className="text-center text-sm text-muted-foreground">
             Remember your password?{" "}
             <Link
               href="/login"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
               Sign in
             </Link>
           </p>
-        </CardFooter>
+        </AuthCardFooter>
       </form>
-    </Card>
+    </AuthCard>
   );
 }

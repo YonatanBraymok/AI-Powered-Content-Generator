@@ -3,22 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail, User, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useRegister } from "@/hooks/use-auth";
 import type { ApiError } from "@/lib/api";
 import { validateEmail, validatePassword } from "@/lib/validation";
+import { Button } from "@/components/ui";
 import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from "@/components/ui";
+  AuthCard,
+  AuthCardContent,
+  AuthCardFooter,
+  AuthCardHeader,
+} from "@/components/auth/auth-card";
+import { AuthField } from "@/components/auth/auth-field";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -66,69 +63,60 @@ export default function RegisterPage() {
   }
 
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Create an account</CardTitle>
-        <CardDescription>
-          Get started with AI-powered content generation
-        </CardDescription>
-      </CardHeader>
+    <AuthCard>
+      <AuthCardHeader
+        title="Create an account"
+        description="Get started with AI-powered content generation."
+      />
       <form onSubmit={handleSubmit} noValidate>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="Your name"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={register.isPending}
-            />
-            {fieldErrors.name && (
-              <p className="text-sm text-destructive">{fieldErrors.name}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={register.isPending}
-            />
-            {fieldErrors.email && (
-              <p className="text-sm text-destructive">{fieldErrors.email}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={register.isPending}
-            />
-            {fieldErrors.password ? (
-              <p className="text-sm text-destructive">{fieldErrors.password}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)
-              </p>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-4">
+        <AuthCardContent className="space-y-5">
+          <AuthField
+            id="name"
+            label="Name"
+            type="text"
+            placeholder="Your name"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={register.isPending}
+            icon={<User className="size-4" />}
+            error={fieldErrors.name}
+          />
+          <AuthField
+            id="email"
+            label="Email address"
+            type="email"
+            placeholder="name@company.com"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={register.isPending}
+            icon={<Mail className="size-4" />}
+            error={fieldErrors.email}
+          />
+          <AuthField
+            id="password"
+            label="Password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={register.isPending}
+            icon={<Lock className="size-4" />}
+            error={fieldErrors.password}
+            helper={
+              fieldErrors.password
+                ? undefined
+                : "Min 8 characters — include uppercase, lowercase, number, and special character (e.g. !@#$)"
+            }
+          />
+        </AuthCardContent>
+
+        <AuthCardContent className="pt-0">
           <Button
             type="submit"
-            className="w-full"
+            className="auth-primaryButton w-full"
             disabled={register.isPending}
           >
             {register.isPending ? (
@@ -140,17 +128,20 @@ export default function RegisterPage() {
               "Create account"
             )}
           </Button>
+        </AuthCardContent>
+
+        <AuthCardFooter>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-foreground underline-offset-4 hover:underline"
             >
               Sign in
             </Link>
           </p>
-        </CardFooter>
+        </AuthCardFooter>
       </form>
-    </Card>
+    </AuthCard>
   );
 }

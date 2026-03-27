@@ -47,41 +47,42 @@ export function GenerateForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+    <Card className="border-foreground/10 bg-background/50 shadow-2xl shadow-foreground/5">
+      <CardHeader className="pb-6">
+        <CardTitle className="flex items-center gap-2 font-heading text-lg font-bold tracking-tight">
           <Sparkles className="size-5 text-primary" />
-          Generate Content
+          Generate
         </CardTitle>
-        <CardDescription>
-          Enter a topic and choose a writing style to generate AI-powered
-          content.
+        <CardDescription className="text-sm">
+          Choose a topic and editorial style, then generate a draft in seconds.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="flex-1">
-              <Label htmlFor="topic">Topic</Label>
+        <CardContent className="space-y-5">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-7">
+              <Label htmlFor="topic" className="dash-microLabel">
+                Content topic
+              </Label>
               <Input
                 id="topic"
-                className="mt-2"
-                placeholder="e.g. Benefits of remote work"
+                className="mt-2 h-14 rounded-xl bg-background/30 px-5 text-base font-medium placeholder:text-muted-foreground/70 focus-visible:ring-ring/40"
+                placeholder="What should the Oracle write about today?"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 disabled={generate.isPending}
                 required
               />
             </div>
-            <div className="w-full sm:w-44">
-              <Label>Style</Label>
+            <div className="lg:col-span-3">
+              <Label className="dash-microLabel">Editorial style</Label>
               <Select
                 value={style}
                 onValueChange={(v) => {
                   if (v) setStyle(v);
                 }}
               >
-                <SelectTrigger className="mt-2 w-full">
+                <SelectTrigger className="mt-2 h-14 w-full rounded-xl bg-background/30 px-5 text-base font-medium focus-visible:ring-ring/40">
                   <SelectValue placeholder="Select style" />
                 </SelectTrigger>
                 <SelectContent>
@@ -93,7 +94,12 @@ export function GenerateForm() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={generate.isPending || !topic.trim()}>
+            <div className="lg:col-span-2">
+              <Button
+                type="submit"
+                className="h-14 w-full rounded-xl font-heading font-bold shadow-lg shadow-primary/20 transition-transform active:translate-y-px"
+                disabled={generate.isPending || !topic.trim()}
+              >
               {generate.isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
@@ -105,7 +111,8 @@ export function GenerateForm() {
                   Generate
                 </>
               )}
-            </Button>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </form>

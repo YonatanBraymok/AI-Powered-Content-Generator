@@ -31,6 +31,7 @@ import {
   Label,
   Separator,
 } from "@/components/ui";
+import { SectionHeader } from "@/components/dashboard/section-header";
 
 function ProfileSection() {
   const { data: user } = useCurrentUser();
@@ -81,7 +82,7 @@ function ProfileSection() {
   }
 
   return (
-    <Card>
+    <Card className="border-foreground/10 bg-card/80 shadow-2xl shadow-foreground/5">
       <CardHeader>
         <CardTitle>Profile</CardTitle>
         <CardDescription>Update your name and email address.</CardDescription>
@@ -199,7 +200,7 @@ function PasswordSection() {
   }
 
   return (
-    <Card>
+    <Card className="border-foreground/10 bg-card/80 shadow-2xl shadow-foreground/5">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -315,7 +316,7 @@ function DangerZoneSection() {
   }
 
   return (
-    <Card className="border-destructive/40">
+    <Card className="border-destructive/40 bg-card/80 shadow-2xl shadow-foreground/5">
       <CardHeader>
         <div className="flex items-center gap-2">
           <ShieldAlert className="size-4 text-destructive" />
@@ -368,23 +369,21 @@ function DangerZoneSection() {
 
 export default function SettingsPage() {
   return (
-    <div className="space-y-8">
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account details and preferences.
-          </p>
-        </div>
-        <Button variant="ghost" size="sm" render={<Link href="/dashboard" />}>
-          <ArrowLeft className="size-4" />
-          Back to Dashboard
-        </Button>
-      </div>
+    <div className="space-y-10">
+      <SectionHeader
+        title="Settings"
+        description="Manage your account details and preferences."
+        right={
+          <Button variant="ghost" size="sm" render={<Link href="/dashboard" />}>
+            <ArrowLeft className="size-4" />
+            Back to Dashboard
+          </Button>
+        }
+      />
 
-      <Separator />
+      <Separator className="opacity-60" />
 
-      <div className="mx-auto max-w-xl space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6">
         <ProfileSection />
         <PasswordSection />
         <DangerZoneSection />
