@@ -3,17 +3,21 @@ import { RedisStore } from "rate-limit-redis";
 import type { RedisReply } from "rate-limit-redis";
 import redis from "../lib/redis";
 
-const store = new RedisStore({
-  sendCommand: (...args: string[]) =>
-    redis.call(...(args as [string, ...string[]])) as Promise<RedisReply>,
-});
+function makeStore(prefix: string) {
+  if (!process.env.REDIS_URL) return undefined;
+  return new RedisStore({
+    sendCommand: (...args: string[]) =>
+      redis.call(...(args as [string, ...string[]])) as Promise<RedisReply>,
+    prefix,
+  });
+}
 
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store,
+  store: makeStore("rl:general"),
 });
 
 export const authLimiter = rateLimit({
@@ -21,7 +25,7 @@ export const authLimiter = rateLimit({
   max: 10,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store,
+  store: makeStore("rl:auth"),
 });
 
 export const generateLimiter = rateLimit({
@@ -29,7 +33,7 @@ export const generateLimiter = rateLimit({
   max: 10,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store,
+  store: makeStore("rl:generate"),
 });
 
 export const passwordResetLimiter = rateLimit({
@@ -37,5 +41,5 @@ export const passwordResetLimiter = rateLimit({
   max: 3,
   standardHeaders: "draft-7",
   legacyHeaders: false,
-  store,
+  store: makeStore("rl:passwordReset"),
 });
