@@ -10,10 +10,12 @@ import {
   deletePost,
 } from "../services/post";
 import logger from "../lib/logger";
+import { cacheResponse } from "../middleware/cache";
+import redis from "../lib/redis";
 
 const router = Router();
 
-router.get("/shared/:shareId", async (req: Request, res: Response) => {
+router.get("/shared/:shareId", cacheResponse(60), async (req: Request, res: Response) => {
   try {
     const post = await getPostByShareId(req.params.shareId as string);
     if (!post) {
@@ -27,7 +29,7 @@ router.get("/shared/:shareId", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/users/:userId/published", async (req: Request, res: Response) => {
+router.get("/users/:userId/published", cacheResponse(30), async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId as string;
     const [user, posts] = await Promise.all([
@@ -92,6 +94,13 @@ router.patch("/:id", async (req: Request, res: Response) => {
     if (!post) {
       res.status(404).json({ error: "Post not found" });
       return;
+    }
+
+    if (isPublished !== undefined) {
+      await Promise.all([
+        redis.del(`cache:/api/posts/shared/${post.shareId}`),
+        redis.del(`cache:/api/posts/users/${post.userId}/published`),
+      ]).catch(() => {});
     }
 
     res.json({ post });
